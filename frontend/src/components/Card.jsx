@@ -1,8 +1,9 @@
 // import Image from "next/image";
 import { Star } from "lucide-react";
-
+import GeolocationComponent from "./GeolocationComponent";
 export function ItemCard({ item }) {
   console.log(item)
+  
   return (
     <div className="overflow-hidden border border-gray-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white">
       {/* Image Section */}
@@ -48,7 +49,9 @@ export function ItemCard({ item }) {
             
             return <span>Expires in: {daysLeft} {daysLeft === 1 ? "day" : "days"}</span>;
           })()}
-          <span>{item.distance} away</span>
+          {item.details && item.details.distance
+                ? <span style={{ color: 'blue' }}>Distance: {item.details.distance}m</span>
+                : <span style={{ color: 'gray' }}></span>}
         </div>
 
         <div className="flex justify-between items-center text-sm">
