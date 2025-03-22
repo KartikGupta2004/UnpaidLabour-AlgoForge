@@ -37,24 +37,25 @@ import SignUp from "./pages/SignUp/SignUpForIndividual";
 // import AdminPanel from "./pages/AdminPanel";
 // import Navbar from "./components/Navbar";
 // import Footer from "./components/Footer";
-
+import ListedItem from "./components/ListedItem";
 function App() {
   return (
-    <Router>
-      {/* <Navbar /> */}
-      <Routes>
-        {/* <Route path="/" element={<Home />} /> */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/signUp" element={<SignUp />} />
-        {/* <Route path="/dashboard" element={<Dashboard />} /> */}
-        {/* <Route path="/list-food" element={<ListFood />} /> */}
-        {/* <Route path="/marketplace" element={<Marketplace />} /> */}
-        {/* <Route path="/order-confirmation" element={<OrderConfirmation />} /> */}
-        {/* <Route path="/rewards" element={<Rewards />} /> */}
-        {/* <Route path="/admin" element={<AdminPanel />} /> */}
-      </Routes>
-      {/* <Footer /> */}
-    </Router>
+    <ListedItem/>
+    // <Router>
+    //   {/* <Navbar /> */}
+    //   <Routes>
+    //     {/* <Route path="/" element={<Home />} /> */}
+    //     <Route path="/login" element={<Login />} />
+    //     <Route path="/signUp" element={<SignUp />} />
+    //     {/* <Route path="/dashboard" element={<Dashboard />} /> */}
+    //     {/* <Route path="/list-food" element={<ListFood />} /> */}
+    //     {/* <Route path="/marketplace" element={<Marketplace />} /> */}
+    //     {/* <Route path="/order-confirmation" element={<OrderConfirmation />} /> */}
+    //     {/* <Route path="/rewards" element={<Rewards />} /> */}
+    //     {/* <Route path="/admin" element={<AdminPanel />} /> */}
+    //   </Routes>
+    //   {/* <Footer /> */}
+    // </Router>
   );
 }
 
