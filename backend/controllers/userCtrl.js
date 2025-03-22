@@ -54,7 +54,8 @@ const loginController = async (req, res) => {
 
     // } else {
       // Email/password login
-      const { email, password, role } = req.body;
+      // console.log(req.body)
+      const { email, password } = req.body;
       const existingUser = await Individual.findOne({ email }) || await Kitchen.findOne({ email }) || await Ngo.findOne({ email });
       
       if (!existingUser) {
@@ -68,6 +69,7 @@ const loginController = async (req, res) => {
         return res.status(400).send({ message: "Invalid Password", success: false });
       }
 
+      const role = existingUser.role;
       const token = jwt.sign({ id: existingUser._id }, process.env.JWT_SECRET, {
         expiresIn: "1d",
       });
@@ -89,8 +91,7 @@ const loginController = async (req, res) => {
 // Register Controller
 const registerController = async (req, res) => {
   try {
-    const { email, password, role, name, location, contact, fssaiId } = req.body;
-    console.log("\n\n\nname: ",name);
+    const { email, password, role, name, location, contact, fssaiId, ngoId } = req.body;
     
     if (!validator.isEmail(email)) {
       return res.status(400).send({ message: "Invalid email format", success: false });
@@ -127,8 +128,10 @@ const registerController = async (req, res) => {
       if (existingUser) return res.status(400).send({ message: "Email already in use", success: false });
 
       newUser = new Kitchen({
-        fssaiId, // Fixed required field
+        role,
+        name,
         email,
+        fssaiId, // Fixed required field
         password: hashedPassword,
         location,
       });
@@ -137,7 +140,9 @@ const registerController = async (req, res) => {
       if (existingUser) return res.status(400).send({ message: "Email already in use", success: false });
 
       newUser = new Ngo({
-        ngoId: name, // Assuming NGO name is stored in ngoId
+        role,
+        name,
+        ngoId, // Assuming NGO name is stored in ngoId
         email,
         password: hashedPassword,
         location,
@@ -166,31 +171,28 @@ const registerController = async (req, res) => {
 
 
 // Auth Controller (for getting user info)
-// const authController = async (req, res) => {
-//   console.log(req.body)
-//   try {
-//     const users = await user.findById({ _id: req.body.userId });
-//     if (!users) {
-//       return res.status(200).send({
-//         message: "User not found",
-//         success: false,
-//       });
-//     }
-//     res.status(200).send({
-//       success: true,
-//       data: {
-//         name: users.name,
-//         email: users.email,
-//       },
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).send({
-//       message: "Auth error",
-//       success: false,
-//       error,
-//     });
-//   }
-// };
+const authController = async (req, res) => {
+  console.log(req.body)
+  try {
+    const users = await Individual.findById({ _id: req.body._id }) || await Kitchen.findById({ _id: req.body._id }) || await Ngo.findById({ _id: req.body._id });
+    if (!users) {
+      return res.status(200).send({
+        message: "User not found",
+        success: false,
+      });
+    }
+    res.status(200).send({
+      success: true,
+      users
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      message: "Auth error",
+      success: false,
+      error,
+    });
+  }
+};
 
-export { loginController, registerController};
+export { loginController, registerController, authController};

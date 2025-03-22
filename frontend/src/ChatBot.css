@@ -1,53 +1,64 @@
-/* ChatBot.css */
-
 /* Floating Chat Icon */
 .chat-icon {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: #007bff;
+  background: linear-gradient(135deg, #007bff, #0056b3);
   color: white;
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
   z-index: 1000;
-  font-size: 24px;
+  font-size: 26px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Chat Window Container */
+.chat-icon:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Chat Window */
 .chat-window {
   position: fixed;
   bottom: 80px;
   right: 20px;
-  width: 350px;
+  width: 380px;
   max-width: 90%;
-  background: #f9f9f9;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
   z-index: 1000;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   animation: fadeIn 0.3s ease-in-out;
 }
 
 /* Fade-in Animation */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Chat Header */
 .chat-header {
-  background: #007bff;
+  background: linear-gradient(135deg, #007bff, #0056b3);
   color: white;
-  padding: 10px;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+  padding: 15px;
+  font-size: 16px;
+  font-weight: bold;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -58,15 +69,21 @@
   background: transparent;
   border: none;
   color: white;
-  font-size: 16px;
+  font-size: 18px;
   cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.close-button:hover {
+  color: #ccc;
 }
 
 /* Chat Box */
 .chat-box {
   display: flex;
   flex-direction: column;
-  height: 400px;
+  height: 420px;
+  background: #f9f9f9;
 }
 
 /* Messages Area */
@@ -75,16 +92,31 @@
   overflow-y: auto;
   padding: 15px;
   background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+}
+
+/* Custom Scrollbar */
+.messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.messages::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 6px;
 }
 
 /* Chat Message */
 .message {
   max-width: 80%;
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 10px;
+  padding: 12px;
+  border-radius: 10px;
   font-size: 14px;
   word-wrap: break-word;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* User Message Style */
@@ -92,6 +124,7 @@
   align-self: flex-end;
   background: #007bff;
   color: white;
+  border-top-right-radius: 0;
 }
 
 /* Bot Message Style */
@@ -99,6 +132,7 @@
   align-self: flex-start;
   background: #e0e0e0;
   color: #333;
+  border-top-left-radius: 0;
 }
 
 /* Loading Indicator */
@@ -107,37 +141,42 @@
   font-size: 14px;
   color: #666;
   padding: 10px;
+  font-style: italic;
 }
 
 /* Input Container */
 .input-container {
   display: flex;
-  padding: 10px;
+  padding: 12px;
   background: #fff;
   border-top: 1px solid #ddd;
+  gap: 10px;
 }
 
 /* Chat Input */
 .chat-input {
   flex: 1;
-  padding: 10px;
+  padding: 12px;
   border: none;
   outline: none;
-  border-radius: 5px;
+  border-radius: 8px;
   background: #f0f0f0;
+  font-size: 14px;
 }
 
 /* Send Button */
 .send-button {
-  margin-left: 10px;
-  background: #007bff;
+  background: linear-gradient(135deg, #007bff, #0056b3);
   color: white;
   border: none;
-  padding: 10px;
-  border-radius: 5px;
+  padding: 12px 15px;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .send-button:hover {
-  background: #0056b3;
+  background: linear-gradient(135deg, #0056b3, #003d80);
+  transform: scale(1.05);
 }
