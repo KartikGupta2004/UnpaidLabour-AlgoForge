@@ -4,25 +4,39 @@ const { Schema, model } = mongoose;
 
 const listedItemSchema = new Schema(
   {
-    itemId: { type: mongoose.Schema.Types.ObjectId, auto: true }, // Unique Item ID
     itemName: { type: String, required: true },
     itemType: { type: String, enum: ["Perishable", "Non-Perishable"], required: true },
     quantity: { type: Number, required: true },
-    cost: { type: Number, required: true },
-    status: { type: String, enum: ["Pending", "Delivered"], default: "Pending" },
-    receiverId: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null }, // Receiver's ID (Individual, Kitchen, or NGO)
+    cost: { type: Number },
 
-    // Dynamic Reference for Individual OR Kitchen
-    listedById: { type: mongoose.Schema.Types.ObjectId, required: true },
-    listedByType: { type: String, enum: ["Individual", "Kitchen"], required: true },
-    listedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      refPath: "listedByType", // Dynamically references either Individual or Kitchen
-      required: true,
-    },
+    // ✅ New Field: Listing Type (Marketplace or Donation)
+    listingType: { type: String, enum: ["Marketplace", "Donation"], required: true },
+
+    status: { type: String, enum: ["Pending", "Delivered"], default: "Pending" },
+    receiverId: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+    Description: { type: String },
+
+    listedById: { type: mongoose.Schema.Types.ObjectId },
+    listedByType: { type: String, enum: ["individual", "kitchen"] },
+    listedBy: { type: mongoose.Schema.Types.ObjectId, refPath: "listedByType" },
+
+    name: { type: String, required: true },
+    contact: { type: String, required: true },
+    location: { type: String, required: true },
+
+    // Expiry Date
+    expiryDate: { type: Date },
   },
   { timestamps: true }
 );
+
+// ✅ Middleware: Auto-set expiry date ONLY for Non-Perishable items
+listedItemSchema.pre("save", function (next) {
+  if (this.itemType === "Non-Perishable" && !this.expiryDate) {
+    this.expiryDate = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000); // 2 days from now
+  }
+  next();
+});
 
 const ListedItem = model("ListedItem", listedItemSchema);
 export default ListedItem;
