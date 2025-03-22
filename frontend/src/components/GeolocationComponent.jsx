@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 
-const NearestAddressFinder = () => {
+const GeolocationComponent = () => {
   const HERE_API_KEY = import.meta.env.VITE_HERE_API_KEY;
 
   const [locationSource, setLocationSource] = useState('');
@@ -180,4 +180,4 @@ const NearestAddressFinder = () => {
     </div>
   );
 };
-export default NearestAddressFinder;
+export default GeolocationComponent;
