@@ -282,7 +282,7 @@ const GeolocationComponent = () => {
               <br />
               {item.details && item.details.distance
                 ? <span style={{ color: 'blue' }}>Distance: {item.details.distance}m</span>
-                : <span style={{ color: 'gray' }}>Unsorted</span>}
+                : <span style={{ color: 'gray' }}></span>}
             </li>
           ))}
         </ul>
