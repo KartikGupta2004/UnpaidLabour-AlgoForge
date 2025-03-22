@@ -79,8 +79,44 @@ const schemaInfo = `
   }
 `;
 
+// Website features and information
+const websiteInfo = `
+  Website: Food Donation and Redistribution Platform
+  
+  Key Features:
+  1. User Roles: 
+     - Individuals: Can donate food, receive donations, and place/receive orders
+     - Kitchens: Professional food services that can distribute food to those in need
+     - NGOs: Organizations that receive and distribute donations
+  
+  2. Food Donation System:
+     - Users can list food items they want to donate
+     - Items can be perishable or non-perishable
+     - Users earn rewards for donations
+  
+  3. Order System:
+     - Users can place orders for food items
+     - Orders have status tracking (pending, completed)
+     - Transactions track the exchange between server and receiver
+  
+  4. Community Features:
+     - Community groups for local food sharing
+     - Rating system for kitchens
+  
+  5. Rewards System:
+     - Users earn rewards for donations
+     - Rewards can be used for various benefits on the platform
+  
+  Common User Questions:
+  - How to donate food
+  - How to track donations
+  - How to check order status
+  - How to join community groups
+  - How to earn and use rewards
+`;
+
 /**
- * @desc Smart AI-powered query handling for MongoDB
+ * @desc Smart AI-powered assistant for the food donation platform
  * @route POST /api/query
  * @access Public
  */
@@ -93,34 +129,47 @@ const getQueryAnswerFromDatabase = async (req, res) => {
     }
     
     if (!userId) {
-      return res.status(400).json({ message: "User ID is required for personalized queries" });
+      return res.status(400).json({ message: "User ID is required for personalized assistance" });
     }
 
     console.log(`Processing query: "${query}" for user: ${userId}`);
 
-    // Step 1: Plan the database query using LLM
-    const queryPlan = await planDatabaseQuery(query, userId);
-    console.log("Query planning complete:", queryPlan);
+    // Step 1: Determine if the query needs database access or just general information
+    const queryAnalysis = await analyzeQuery(query, userId);
+    console.log("Query analysis complete:", queryAnalysis);
 
-    // Step 2: Generate MongoDB query based on the plan
-    const mongoQueryObject = await generateMongoDBQuery(queryPlan, userId);
-    console.log("Generated MongoDB query:", mongoQueryObject);
+    let response;
+    let metadata = { queryType: queryAnalysis.queryType };
 
-    // Step 3: Execute the MongoDB query
-    const results = await executeMongoDBQuery(mongoQueryObject);
-    console.log("Query execution complete. Results obtained.");
-
-    // Step 4: Generate natural language response
-    const response = await generateResponse(query, results);
-    console.log("Response generation complete.");
-
-    return res.json({ 
-      reply: response,
-      metadata: {
+    // Step 2: Handle the query based on its type
+    if (queryAnalysis.queryType === "database") {
+      // Database query flow
+      const queryPlan = await planDatabaseQuery(query, userId, queryAnalysis);
+      console.log("Query planning complete:", queryPlan);
+      
+      const mongoQueryObject = await generateMongoDBQuery(queryPlan, userId);
+      console.log("Generated MongoDB query:", mongoQueryObject);
+      
+      const results = await executeMongoDBQuery(mongoQueryObject);
+      console.log("Query execution complete. Results obtained.");
+      
+      response = await generateResponse(query, results, queryAnalysis, queryPlan);
+      
+      metadata = {
+        ...metadata,
         queryPlan: queryPlan,
         mongoQuery: mongoQueryObject,
         rawResults: results
-      }
+      };
+    } else {
+      // General information or guidance flow
+      response = await generateInformationalResponse(query, queryAnalysis);
+    }
+
+    console.log("Response generation complete.");
+    return res.json({ 
+      reply: response,
+      metadata: metadata
     });
 
   } catch (error) {
@@ -149,18 +198,93 @@ const getQueryAnswerFromDatabase = async (req, res) => {
     });
   }
 };
+
+/**
+ * Step 0: Analyze the query to determine if it needs database access
+ * @param {string} query - User's natural language query
+ * @param {string} userId - User's ID
+ * @returns {object} Query analysis information
+ */
+async function analyzeQuery(query, userId) {
+  const analysisPrompt = `
+    You are an intelligent assistant for a food donation and redistribution platform.
+    
+    User query: "${query}"
+    User ID: "${userId}"
+    
+    Website information:
+    ${websiteInfo}
+    
+    Database schema information:
+    ${schemaInfo}
+    
+    Your task:
+    1. Analyze if this query requires database access or can be answered with general information
+    2. Identify the category of the query (account, orders, donations, general info, features, etc.)
+    3. Determine if this is a personal data query (requires database) or general question (can be answered without database)
+    
+    Return a JSON object with the following structure:
+    {
+      "queryType": "database" or "informational",
+      "category": "account", "orders", "donations", "features", "help", etc.,
+      "requiresPersonalData": boolean,
+      "intent": "Brief description of what the user wants",
+      "contextNeeded": ["specific pieces of context that would be helpful"]
+    }
+    
+    IMPORTANT: Return only the raw JSON object. Do not wrap it in code blocks, quotes, or any other formatting.
+  `;
+
+  try {
+    const response = await axios.post(
+      GEMINI_API_ENDPOINT,
+      { contents: [{ role: "user", parts: [{ text: analysisPrompt }] }] },
+      { params: { key: GEMINI_API_KEY } }
+    );
+
+    let analysisText = response.data.candidates[0].content.parts[0].text.trim();
+    
+    // Remove any Markdown code block formatting if present
+    if (analysisText.startsWith("```json") || analysisText.startsWith("```")) {
+      analysisText = analysisText.replace(/^```json\s*|^```\s*/g, "").replace(/\s*```$/g, "");
+    }
+    
+    // Remove any leading/trailing quotes if present
+    analysisText = analysisText.replace(/^['"`]|['"`]$/g, "");
+    
+    try {
+      return JSON.parse(analysisText);
+    } catch (parseError) {
+      console.error("JSON parse error:", parseError, "Raw text:", analysisText);
+      // Default to database query if we can't parse the analysis
+      return {
+        queryType: "database",
+        category: "unknown",
+        requiresPersonalData: true,
+        intent: "Process user query",
+        contextNeeded: []
+      };
+    }
+  } catch (error) {
+    console.error("Error during query analysis:", error);
+    throw new Error("Failed to analyze query");
+  }
+}
+
 /**
  * Step 1: Plan the database query
  * @param {string} query - User's natural language query
  * @param {string} userId - User's ID
+ * @param {object} queryAnalysis - Analysis of the query
  * @returns {object} Query planning information
  */
-async function planDatabaseQuery(query, userId) {
+async function planDatabaseQuery(query, userId, queryAnalysis) {
   const planningPrompt = `
     You are a MongoDB query planner that converts natural language questions into structured query plans.
     
     User query: "${query}"
     User ID: "${userId}"
+    Query analysis: ${JSON.stringify(queryAnalysis)}
     
     Database schema information:
     ${schemaInfo}
@@ -178,7 +302,7 @@ async function planDatabaseQuery(query, userId) {
       "primaryCollection": "MainCollection",
       "filters": {
         "fieldName": "value or condition",
-        "_id": "Must include the user ID for security"
+        "userId": "Must include the user ID for security"
       },
       "aggregation": boolean (whether aggregation is needed),
       "requiredFields": ["field1", "field2"]
@@ -203,7 +327,7 @@ async function planDatabaseQuery(query, userId) {
     
     // Remove any leading/trailing quotes if present
     planText = planText.replace(/^['"`]|['"`]$/g, "");
-    console.log(planText)
+    
     try {
       return JSON.parse(planText);
     } catch (parseError) {
@@ -216,6 +340,12 @@ async function planDatabaseQuery(query, userId) {
   }
 }
 
+/**
+ * Step 2: Generate MongoDB query based on plan
+ * @param {object} queryPlan - Query planning information
+ * @param {string} userId - User's ID
+ * @returns {object} MongoDB query object
+ */
 async function generateMongoDBQuery(queryPlan, userId) {
   const queryGenerationPrompt = `
     Based on this query plan:
@@ -381,31 +511,37 @@ async function executeMongoDBQuery(queryObject) {
 }
 
 /**
- * Step 4: Generate natural language response
+ * Generate a response for database queries
  * @param {string} originalQuery - User's original query
  * @param {array|object} results - MongoDB query results
+ * @param {object} queryAnalysis - Analysis of the query
+ * @param {object} queryPlan - Query planning information
  * @returns {string} Natural language response
  */
-async function generateResponse(originalQuery, results) {
+async function generateResponse(originalQuery, results, queryAnalysis, queryPlan) {
   const responsePrompt = `
-    You are an AI assistant that converts database results into natural, conversational responses.
+    You are an intelligent, conversational assistant for a food donation and redistribution platform.
     
     Original user query: "${originalQuery}"
+    Query analysis: ${JSON.stringify(queryAnalysis)}
+    Query plan: ${JSON.stringify(queryPlan)}
     
     Database results: ${JSON.stringify(results, null, 2)}
     
-    Please generate a natural language response that:
-    1. Directly answers the user's question
-    2. Summarizes the key information from the results
-    3. Is conversational and friendly in tone
+    Website information:
+    ${websiteInfo}
+    
+    Please generate a detailed, helpful response that:
+    1. Directly answers the user's question using the database results
+    2. Provides context and explanation where helpful
+    3. Is conversational, friendly, and engaging in tone
     4. Includes specific details from the results where relevant
-    5. Handles cases where results might be empty or null
+    5. Offers relevant follow-up suggestions or tips based on their query
+    6. Handles cases where results might be empty or null gracefully
     
-    Your response should NOT:
-    - Include technical database terminology
-    - Mention the query itself or how it was processed
-    - Include JSON formatting or raw data dumps
-    
+    Your response should be specific.
+    Consider how you would explain this information to a friend in a helpful way.
+    Bold the specific answer keywords
     Response:
   `;
 
@@ -421,6 +557,49 @@ async function generateResponse(originalQuery, results) {
     console.error("Error generating response:", error);
     return "I found the information you requested, but I'm having trouble putting it into words. Here's what I found: " + 
            JSON.stringify(results, null, 2);
+  }
+}
+
+/**
+ * Generate a response for informational queries (no database required)
+ * @param {string} originalQuery - User's original query
+ * @param {object} queryAnalysis - Analysis of the query
+ * @returns {string} Natural language response
+ */
+async function generateInformationalResponse(originalQuery, queryAnalysis) {
+  const responsePrompt = `
+    You are an intelligent, conversational assistant for a food donation and redistribution platform.
+    
+    Original user query: "${originalQuery}"
+    Query analysis: ${JSON.stringify(queryAnalysis)}
+    
+    Website information:
+    ${websiteInfo}
+    
+    Please generate a helpful response that:
+    1. Directly addresses the user's question using the website information
+    2. Is conversational, friendly, and engaging in tone
+    3. Offers relevant follow-up suggestions or tips based on their query
+    4. Includes examples where helpful
+    
+    Your response should be specific, like a knowledgeable customer service agent.
+    Consider how you would explain this information to a friend in a helpful way.
+    Bold the specific answer keywords
+
+    Response:
+  `;
+
+  try {
+    const response = await axios.post(
+      GEMINI_API_ENDPOINT,
+      { contents: [{ role: "user", parts: [{ text: responsePrompt }] }] },
+      { params: { key: GEMINI_API_KEY } }
+    );
+
+    return response.data.candidates[0].content.parts[0].text.trim();
+  } catch (error) {
+    console.error("Error generating informational response:", error);
+    return "I understand you're asking about our platform's features. Let me help you with that. Our food donation platform allows individuals and organizations to connect for food sharing and distribution. What specific aspect would you like to know more about?";
   }
 }
 
