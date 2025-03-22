@@ -7,29 +7,19 @@ const GeolocationComponent = () => {
   const [locationSource, setLocationSource] = useState('');
   const [userLocation, setUserLocation] = useState(null);
   const [manualAddress, setManualAddress] = useState('');
-  const [nearestAddresses, setNearestAddresses] = useState([]);
+  const [nearestItems, setNearestItems] = useState([]);
   const [error, setError] = useState('');
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // To track which items have already been processed for deletion
+  const expiredProcessed = useRef(new Set());
 
   const mapRef = useRef(null);
   const platformRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const uiRef = useRef(null);
 
-  const candidateAddresses = [
-    'Gajalee, Kadamgiri Complex, Vile Parle East, Mumbai',
-    '1441 Pizzeria Lokhandwala, Andheri West, Mumbai',
-    "The Table, Colaba, Mumbai, Maharashtra, India",
-    "Trishna, 7, Maheshwari Marg, Fort, Mumbai, Maharashtra, India",
-    "Gajalee, Santacruz West, Mumbai, Maharashtra, India",
-    "BadeMiya, Apollo Bunder, Mumbai, Maharashtra, India",
-    "Bombay Canteen, Kamala Mills Compound, Lower Parel, Mumbai, Maharashtra, India",
-    "Masala Library, Pali Hill, Mumbai, Maharashtra, India",
-    "Hakkasan, Juhu, Mumbai, Maharashtra, India",
-    "Yauatcha, Galleria Mall, Bandra Kurla Complex, Mumbai, Maharashtra, India",
-    "Khyber, Linking Road, Bandra West, Mumbai, Maharashtra, India",
-    "The Bombay Salad Bar, Linking Road, Bandra West, Mumbai, Maharashtra, India"
-  ];
-
+  // Initialize the map
   useEffect(() => {
     if (!window.H) {
       setError('HERE Maps API is not loaded.');
@@ -46,6 +36,59 @@ const GeolocationComponent = () => {
     uiRef.current = window.H.ui.UI.createDefault(mapInstanceRef.current, defaultLayers);
     return () => mapInstanceRef.current.dispose();
   }, [HERE_API_KEY]);
+
+  // Update currentTime every second for countdown timers
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // On initial mount, fetch all marketplace items (unsorted)
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/itemlist/marketplace/');
+        // Display the items as they are (unsorted)
+        setNearestItems(response.data);
+      } catch (err) {
+        setError('Error fetching marketplace items: ' + err.message);
+      }
+    };
+    fetchItems();
+  }, []);
+
+  // Monitor each item's countdown and delete from the database as soon as expiry is reached
+  useEffect(() => {
+    const now = new Date();
+
+    const deleteExpiredItems = async () => {
+      const updatedItems = nearestItems.filter((item) => {
+        const expiryTime = new Date(item.expiryDate);
+        return expiryTime > now; // Keep only non-expired items
+      });
+
+      setNearestItems(updatedItems);
+
+      const expiredItems = nearestItems.filter((item) => {
+        const expiryTime = new Date(item.expiryDate);
+        return expiryTime <= now && !expiredProcessed.current.has(item.id);
+      });
+
+      for (const item of expiredItems) {
+        console.log(item);
+        try {
+          await axios.delete(`http://localhost:5000/itemlist/mktplc/${item._id}`);
+          expiredProcessed.current.add(item._id);
+        } catch (err) {
+          console.error('Error deleting expired item:', err.message);
+        }
+      }
+    };
+
+    deleteExpiredItems();
+  }, [currentTime, nearestItems]);
 
   const addMarker = (location, color) => {
     const icon = new window.H.map.Icon(
@@ -68,6 +111,16 @@ const GeolocationComponent = () => {
       );
     } else {
       setError('Geolocation is not supported.');
+    }
+  };
+
+  const fetchMarketplaceItems = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/itemlist/marketplace/');
+      return response.data;
+    } catch (error) {
+      setError('Error fetching marketplace items: ' + error.message);
+      return [];
     }
   };
 
@@ -109,10 +162,12 @@ const GeolocationComponent = () => {
     }
   };
 
+  // Handle form submission: fetch items again, then calculate distances and sort them
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setNearestAddresses([]);
+    // Optionally clear out the unsorted list during the sorted fetch
+    setNearestItems([]);
 
     try {
       let origin = userLocation;
@@ -125,59 +180,116 @@ const GeolocationComponent = () => {
         setUserLocation(origin);
         addMarker(origin, 'blue');
       }
-      
-      if (candidateAddresses.length === 0) {
-        setNearestAddresses(['No current restaurants available']);
+
+      // Re-fetch items so that the latest list is used for distance calculation
+      const items = await fetchMarketplaceItems();
+      if (items.length === 0) {
+        setNearestItems([{ itemName: 'No items available', distance: 'N/A' }]);
         return;
       }
-      
-      const distances = [];
-      for (const address of candidateAddresses) {
-        const destination = await geocodeAddress(address);
-        addMarker(destination, 'green');
-        const details = await getRouteDetails(origin, destination);
-        distances.push({ address, details });
-      }
 
+      // For each item, geocode its address and get route details from the origin
+      const distances = await Promise.all(
+        items.map(async (item) => {
+          const destination = await geocodeAddress(item.location);
+          addMarker(destination, 'green');
+          const details = await getRouteDetails(origin, destination);
+          return { ...item, details };
+        })
+      );
+
+      // Sort the items by the calculated distance
       distances.sort((a, b) => a.details.distance - b.details.distance);
-      const nearestList = distances.slice(0, candidateAddresses.length);
-      setNearestAddresses(nearestList);
+      setNearestItems(distances);
 
+      // Optionally add route markers for the top 3 nearest items
       const colors = ['red', 'orange', 'pink'];
-      nearestList.forEach(({ details }, index) => {
-        if (index < colors.length) {
-          addMarker(details.destination, colors[index]);
-          const lineString = window.H.geo.LineString.fromFlexiblePolyline(details.polyline);
-          const routeLine = new window.H.map.Polyline(lineString, { style: { strokeColor: colors[index], lineWidth: 5 } });
-          mapInstanceRef.current.addObject(routeLine);
-        }
+      distances.slice(0, 3).forEach(({ details }, index) => {
+        addMarker(details.destination, colors[index]);
+        const lineString = window.H.geo.LineString.fromFlexiblePolyline(details.polyline);
+        const routeLine = new window.H.map.Polyline(lineString, { style: { strokeColor: colors[index], lineWidth: 5 } });
+        mapInstanceRef.current.addObject(routeLine);
       });
     } catch (err) {
       setError(err.message);
     }
   };
 
+  // Helper function to format countdown (hh:mm:ss)
+  const formatCountdown = (expiry) => {
+    const utcExpiry = new Date(expiry);
+    // Convert UTC expiry to local time (if needed)
+    const localExpiry = new Date(utcExpiry.getTime());
+    let diff = localExpiry - currentTime;
+    if (diff < 0) diff = 0;
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    return `${hours.toString().padStart(2, '0')}:${minutes
+      .toString()
+      .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
+
   return (
     <div style={{ width: '400px', margin: '0 auto' }}>
-      <h2>Find Nearest Address</h2>
+      <h2>Find Marketplace Items</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={handleSubmit}>
         <label>
-          <input type="radio" name="locationSource" value="geolocation" checked={locationSource === 'geolocation'} onChange={() => { setLocationSource('geolocation'); getUserGeolocation(); }} />
+          <input
+            type="radio"
+            name="locationSource"
+            value="geolocation"
+            checked={locationSource === 'geolocation'}
+            onChange={() => { setLocationSource('geolocation'); getUserGeolocation(); }}
+          />
           Use my current location
         </label>
         <br />
         <label>
-          <input type="radio" name="locationSource" value="manual" checked={locationSource === 'manual'} onChange={() => setLocationSource('manual')} />
+          <input
+            type="radio"
+            name="locationSource"
+            value="manual"
+            checked={locationSource === 'manual'}
+            onChange={() => setLocationSource('manual')}
+          />
           Enter my address manually
         </label>
-        <br/>
-        {locationSource === 'manual' && <input type="text" value={manualAddress} onChange={(e) => setManualAddress(e.target.value)} required />}
-        <br/><button type="submit">Find Nearest Address</button>
+        <br />
+        {locationSource === 'manual' && (
+          <input
+            type="text"
+            value={manualAddress}
+            onChange={(e) => setManualAddress(e.target.value)}
+            required
+          />
+        )}
+        <br />
+        <button type="submit">Find & Sort Items</button>
       </form>
-      {nearestAddresses.length > 0 && <ul>{nearestAddresses.map((addr, i) => <li key={i} style={{ color: 'black' }}><span style={{ color: ['red', 'orange', 'pink'][i] }}>●</span> {addr.address} - {addr.details.distance}m</li>)}</ul>}
-      <div ref={mapRef} style={{ width: '100%', height: '400px', border: '1px solid #ccc' }}></div>
+
+      <div ref={mapRef} style={{ width: '100%', height: '400px', border: '1px solid #ccc', marginTop: '20px' }}></div>
+      {/* Marketplace items list */}
+      {nearestItems.length > 0 && (
+        <ul style={{ padding: 0, listStyle: 'none', marginTop: '20px' }}>
+          {nearestItems.map((item, i) => (
+            <li key={i} style={{ marginBottom: '15px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
+              <strong>{item.itemName}</strong> {item.quantity && `(${item.quantity})`} - {item.cost ? `${item.cost} Rs` : ''}
+              <br />Seller: {item.name} | Contact: {item.contact}
+              <br />Location: {item.location}
+              <br />Expiry: {formatCountdown(item.expiryDate)}
+              <br />
+              {item.details && item.details.distance
+                ? <span style={{ color: 'blue' }}>Distance: {item.details.distance}m</span>
+                : <span style={{ color: 'gray' }}></span>}
+            </li>
+          ))}
+        </ul>
+      )}
+
     </div>
   );
 };
+
 export default GeolocationComponent;
