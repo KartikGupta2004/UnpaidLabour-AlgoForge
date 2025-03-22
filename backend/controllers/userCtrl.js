@@ -134,6 +134,7 @@ const registerController = async (req, res) => {
         fssaiId, // Fixed required field
         password: hashedPassword,
         location,
+        contact
       });
     } else if (role === "ngo") {
       existingUser = await Ngo.findOne({ email });
@@ -172,9 +173,9 @@ const registerController = async (req, res) => {
 
 // Auth Controller (for getting user info)
 const authController = async (req, res) => {
-  console.log(req.body)
+  // console.log(req.user.id)
   try {
-    const users = await Individual.findById({ _id: req.body._id }) || await Kitchen.findById({ _id: req.body._id }) || await Ngo.findById({ _id: req.body._id });
+    const users = await Individual.findById({ _id: req.user.id }) || await Kitchen.findById({ _id: req.user.id }) || await Ngo.findById({ _id: req.user.id });
     if (!users) {
       return res.status(200).send({
         message: "User not found",

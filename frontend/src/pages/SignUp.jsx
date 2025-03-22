@@ -295,7 +295,7 @@ function SignUp() {
                     value={formData.location}
                     onChange={handleChange}
                     className="w-full pl-10 p-2 border rounded"
-                    placeholder="Location"
+                    placeholder="Address"
                     required
                   />
                   {errors[formData.location] && <p className="text-red-500 text-sm">{errors[formData.location]}</p>}
@@ -327,7 +327,7 @@ function SignUp() {
                       placeholder="NGO ID"
                       required
                     />
-                    {errors[formData.email] && <p className="text-red-500 text-sm">{errors[formData.email]}</p>}
+                    {errors[formData.ngoId] && <p className="text-red-500 text-sm">{errors[formData.ngoId]}</p>}
                   </div>
                 )}
               {serverError && <p className="text-red-500 text-sm font-bold">{serverError}</p>}
