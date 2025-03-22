@@ -52,6 +52,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signUp" element={<SignUp />} />
+        <Route path="/geoLocation" element={<GeolocationComponent />} />
         <Route path="/viewProfile" element={<ProfilePage />} />
         <Route path="/updateProfile" element={<UpdateProfile />} />
         {/* <Route path="/dashboard" element={<Dashboard />} /> */}

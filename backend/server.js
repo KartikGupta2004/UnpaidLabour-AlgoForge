@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import userRoutes from "./routes/userRoutes.js";
 import itemRoute from "./routes/itemRoute.js";
 import chatbotRoute from './routes/chatbotRoutes.js'
+import transactionRoute from "./routes/transactionRoutes.js";
 import individualRoutes from './routes/individualRoutes.js'
 import cors from 'cors'
 dotenv.config(); // Load environment variables
@@ -45,4 +46,5 @@ app.listen(port, () => {
 app.use("/users", userRoutes);
 app.use("/chatBot", chatbotRoute);
 app.use("/itemlist",itemRoute);
+app.use("/transactions",transactionRoute);
 app.use("/individual",individualRoutes);
