@@ -114,7 +114,7 @@ function DonationSection() {
     return (
       <section className="py-20">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className={`${role != 'ngo' ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'flex justify-center items-center'}`}>
             {/* Donation Card */}
                 <div className="bg-white shadow-md rounded-lg p-6 text-center">
                 <h2 className="text-3xl font-bold mb-4">Make a Difference Today</h2>
@@ -123,7 +123,7 @@ function DonationSection() {
                 </p>
                 <Link to='/'>
                 <button className="rounded-full bg-green-400 text-black px-6 py-3 text-lg hover:cursor-pointer">
-                    Donate Now
+                    {role != 'ngo' ? 'Donate Now' : 'Request Donation'}
                 </button>
                 </Link>
                 </div>

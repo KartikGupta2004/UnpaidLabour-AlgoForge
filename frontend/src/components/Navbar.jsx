@@ -8,7 +8,7 @@ import { Pagination, Autoplay } from "swiper/modules"
 function Navbar() {
   const navigate = useNavigate();
   const role = localStorage.getItem('userType');
-  const authToken = localStorage.getItem('authToken');
+  const authToken = localStorage.getItem('authToken') || null;
   return (
     <>
     <header className="w-full py-4 px-4 md:px-8 border-b bg-white shadow-sm">
@@ -26,9 +26,9 @@ function Navbar() {
           <Link to="/contact" className="text-sm font-medium hover:text-primary transition-colors">
             Contact
           </Link>
-          <Link to="/profile" className="text-sm font-medium hover:text-primary transition-colors">
+          {authToken && <Link to="/viewProfile" className="text-sm font-medium hover:text-primary transition-colors">
             Profile
-          </Link>
+          </Link>}
         </nav>
         <div className="flex items-center space-x-4">
           {!authToken ? (
