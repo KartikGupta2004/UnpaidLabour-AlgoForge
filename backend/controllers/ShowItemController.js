@@ -165,5 +165,23 @@ const getItemById = async (req, res) => {
   }
 };
 
+const deleteItem = async (req, res) => {
+  try {
+    const { id } = req.params;
 
-export { getDonationItems, getMarketplaceItems, getItemById, addItem };
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid item ID format" });
+    }
+
+    const item = await ListedItem.findByIdAndDelete(id);
+    if (!item) {
+      return res.status(404).json({ message: "Item not found or already deleted" });
+    }
+
+    res.status(200).json({ message: "Item deleted successfully", id });
+  } catch (error) {
+    console.error("Error deleting item:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+export { getDonationItems, getMarketplaceItems, getItemById, addItem, deleteItem };

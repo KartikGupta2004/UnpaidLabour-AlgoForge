@@ -9,12 +9,17 @@ const GeolocationComponent = () => {
   const [manualAddress, setManualAddress] = useState('');
   const [nearestItems, setNearestItems] = useState([]);
   const [error, setError] = useState('');
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // To track which items have already been processed for deletion
+  const expiredProcessed = useRef(new Set());
 
   const mapRef = useRef(null);
   const platformRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const uiRef = useRef(null);
 
+  // Initialize the map
   useEffect(() => {
     if (!window.H) {
       setError('HERE Maps API is not loaded.');
@@ -31,6 +36,59 @@ const GeolocationComponent = () => {
     uiRef.current = window.H.ui.UI.createDefault(mapInstanceRef.current, defaultLayers);
     return () => mapInstanceRef.current.dispose();
   }, [HERE_API_KEY]);
+
+  // Update currentTime every second for countdown timers
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // On initial mount, fetch all marketplace items (unsorted)
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/itemlist/marketplace/');
+        // Display the items as they are (unsorted)
+        setNearestItems(response.data);
+      } catch (err) {
+        setError('Error fetching marketplace items: ' + err.message);
+      }
+    };
+    fetchItems();
+  }, []);
+
+  // Monitor each item's countdown and delete from the database as soon as expiry is reached
+  useEffect(() => {
+    const now = new Date();
+
+    const deleteExpiredItems = async () => {
+      const updatedItems = nearestItems.filter((item) => {
+        const expiryTime = new Date(item.expiryDate);
+        return expiryTime > now; // Keep only non-expired items
+      });
+
+      setNearestItems(updatedItems);
+
+      const expiredItems = nearestItems.filter((item) => {
+        const expiryTime = new Date(item.expiryDate);
+        return expiryTime <= now && !expiredProcessed.current.has(item.id);
+      });
+
+      for (const item of expiredItems) {
+        console.log(item);
+        try {
+          await axios.delete(`http://localhost:5000/itemlist/mktplc/${item._id}`);
+          expiredProcessed.current.add(item._id);
+        } catch (err) {
+          console.error('Error deleting expired item:', err.message);
+        }
+      }
+    };
+
+    deleteExpiredItems();
+  }, [currentTime, nearestItems]);
 
   const addMarker = (location, color) => {
     const icon = new window.H.map.Icon(
@@ -104,9 +162,11 @@ const GeolocationComponent = () => {
     }
   };
 
+  // Handle form submission: fetch items again, then calculate distances and sort them
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    // Optionally clear out the unsorted list during the sorted fetch
     setNearestItems([]);
 
     try {
@@ -121,22 +181,28 @@ const GeolocationComponent = () => {
         addMarker(origin, 'blue');
       }
 
+      // Re-fetch items so that the latest list is used for distance calculation
       const items = await fetchMarketplaceItems();
       if (items.length === 0) {
         setNearestItems([{ itemName: 'No items available', distance: 'N/A' }]);
         return;
       }
 
-      const distances = await Promise.all(items.map(async (item) => {
-        const destination = await geocodeAddress(item.location);
-        addMarker(destination, 'green');
-        const details = await getRouteDetails(origin, destination);
-        return { ...item, details };
-      }));
+      // For each item, geocode its address and get route details from the origin
+      const distances = await Promise.all(
+        items.map(async (item) => {
+          const destination = await geocodeAddress(item.location);
+          addMarker(destination, 'green');
+          const details = await getRouteDetails(origin, destination);
+          return { ...item, details };
+        })
+      );
 
+      // Sort the items by the calculated distance
       distances.sort((a, b) => a.details.distance - b.details.distance);
       setNearestItems(distances);
 
+      // Optionally add route markers for the top 3 nearest items
       const colors = ['red', 'orange', 'pink'];
       distances.slice(0, 3).forEach(({ details }, index) => {
         addMarker(details.destination, colors[index]);
@@ -147,6 +213,21 @@ const GeolocationComponent = () => {
     } catch (err) {
       setError(err.message);
     }
+  };
+
+  // Helper function to format countdown (hh:mm:ss)
+  const formatCountdown = (expiry) => {
+    const utcExpiry = new Date(expiry);
+    // Convert UTC expiry to local time (if needed)
+    const localExpiry = new Date(utcExpiry.getTime());
+    let diff = localExpiry - currentTime;
+    if (diff < 0) diff = 0;
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    return `${hours.toString().padStart(2, '0')}:${minutes
+      .toString()
+      .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
   return (
@@ -185,24 +266,28 @@ const GeolocationComponent = () => {
           />
         )}
         <br />
-        <button type="submit">Find Items</button>
+        <button type="submit">Find & Sort Items</button>
       </form>
-      
+
+      <div ref={mapRef} style={{ width: '100%', height: '400px', border: '1px solid #ccc', marginTop: '20px' }}></div>
       {/* Marketplace items list */}
       {nearestItems.length > 0 && (
         <ul style={{ padding: 0, listStyle: 'none', marginTop: '20px' }}>
           {nearestItems.map((item, i) => (
             <li key={i} style={{ marginBottom: '15px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
-              <strong>{item.itemName}</strong> ({item.quantity}) - {item.cost} Rs
+              <strong>{item.itemName}</strong> {item.quantity && `(${item.quantity})`} - {item.cost ? `${item.cost} Rs` : ''}
               <br />Seller: {item.name} | Contact: {item.contact}
-              <br />Location: {item.location} | Expiry: {item.expiryDate}
-              <br /><span style={{ color: 'blue' }}>Distance: {item.details.distance}m</span>
+              <br />Location: {item.location}
+              <br />Expiry: {formatCountdown(item.expiryDate)}
+              <br />
+              {item.details && item.details.distance
+                ? <span style={{ color: 'blue' }}>Distance: {item.details.distance}m</span>
+                : <span style={{ color: 'gray' }}>Unsorted</span>}
             </li>
           ))}
         </ul>
       )}
-      
-      <div ref={mapRef} style={{ width: '100%', height: '400px', border: '1px solid #ccc', marginTop: '20px' }}></div>
+
     </div>
   );
 };

@@ -50,6 +50,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signUp" element={<SignUp />} />
+        <Route path="/geoLocation" element={<GeolocationComponent />} />
         {/* <Route path="/dashboard" element={<Dashboard />} /> */}
         {/* <Route path="/list-food" element={<ListFood />} /> */}
         {/* <Route path="/marketplace" element={<Marketplace />} /> */}
