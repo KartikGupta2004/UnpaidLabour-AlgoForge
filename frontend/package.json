@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@shadcn/ui": "^0.0.4",
     "@tailwindcss/vite": "^4.0.15",
     "axios": "^1.8.4",
     "face-api.js": "^0.22.2",
