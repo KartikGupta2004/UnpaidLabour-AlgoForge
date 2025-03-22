@@ -37,7 +37,7 @@ import SignUp from "./pages/SignUp";
 // import AdminPanel from "./pages/AdminPanel";
 import Navbar from "./components/Navbar";
 // import Footer from "./components/Footer";
-
+import ListedItem from "./components/ListedItem";
 function App() {
   return (
     <Router>

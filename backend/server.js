@@ -2,6 +2,8 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import userRoutes from "./routes/userRoutes.js";
+import itemRoute from "./routes/itemRoute.js";
+import chatbotRoute from './routes/chatbotRoutes.js'
 import cors from 'cors'
 dotenv.config(); // Load environment variables
 const app = express();
@@ -40,3 +42,5 @@ app.listen(port, () => {
 });
 
 app.use("/users", userRoutes);
+app.use("/chatBot", chatbotRoute);
+app.use("/itemlist",itemRoute);
