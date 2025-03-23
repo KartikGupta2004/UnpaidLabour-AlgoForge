@@ -52,7 +52,7 @@ function AddItems() {
     <div>
       {/* Floating Add Button */}
       <button
-        className="fixed bottom-22 right-5.5 bg-blue-600 text-white   bg-[linear-gradient(135deg,#007bff,#0056b3)]  p-4.5 rounded-full shadow-black hover:bg-blue-700 transition-all"
+        className="fixed bottom-22 right-5.5 bg-green-600 text-white font-medium  p-4.5 rounded-full shadow-black hover: transition-all transform hover:scale-110 hover:shadow-lg hover:shadow-black/40"
         onClick={() => setIsOpen(true)}
       >
         <IoAdd size={24} />
