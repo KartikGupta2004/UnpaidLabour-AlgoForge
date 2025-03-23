@@ -39,10 +39,11 @@ import ListedItem from "./components/ListedItem";
 // import PriceAI from './components/PriceAI';
 // import PageOne from './components/PageOne';
 import MarketplacePage from './components/MarketplacePage';
+import DonationPage from "./components/DonationPage";
 import ProfilePage from "./pages/Profile";
 import UpdateProfile from "./pages/UpdateProfile";
 import CustomerService from "./pages/CustomerSupport";
-
+import ChatBot from "./components/ChatBot";
 function App() {
   // const [count, setCount] = useState(0)
 
@@ -50,10 +51,12 @@ function App() {
     <Router>
       <Navbar />
       <Routes>
+        <Route path="/chatbot" element={<ChatBot/>} />
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signUp" element={<SignUp />} />
         <Route path="/marketplace" element={<MarketplacePage />} />
+        <Route path="/donation" element={<DonationPage/>} />
         <Route path="/viewProfile" element={<ProfilePage />} />
         <Route path="/updateProfile" element={<UpdateProfile />} />
         <Route path="/contact" element={<CustomerService />} />
