@@ -37,7 +37,7 @@ import Navbar from "./components/Navbar";
 // import Footer from "./components/Footer";
 import ListedItem from "./components/ListedItem";
 // import PriceAI from './components/PriceAI';
-import PageOne from './components/PageOne';
+import PageOne from './components/AddItems';
 import GeolocationComponent from './components/GeolocationComponent';
 import ProfilePage from "./pages/Profile";
 import UpdateProfile from "./pages/UpdateProfile";
