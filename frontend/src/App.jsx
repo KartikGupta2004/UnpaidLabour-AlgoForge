@@ -6,17 +6,14 @@ import MarketplacePage from "./components/MarketplacePage";
 import ProfilePage from "./pages/Profile";
 import UpdateProfile from "./pages/UpdateProfile";
 import CustomerService from "./pages/CustomerSupport";
-<<<<<<< Updated upstream
 import Navbar from "./components/Navbar";
 import ChatBot from "./components/ChatBot"; // ✅ Import Chatbot
 import DonationPage from "./components/DonationPage";
 import Footer from "./components/Footer";
 import AboutUs from "./pages/AboutUs";
 import FaceRecognition from "./components/FaceRecogniton";
-=======
 import ChatBot from "./components/ChatBot";
 import FinalTransaction from "./pages/Transaction.jsx";
->>>>>>> Stashed changes
 function App() {
   const authToken = localStorage.getItem("authToken"); 
 
