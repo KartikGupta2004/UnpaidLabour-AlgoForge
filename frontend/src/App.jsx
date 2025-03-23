@@ -1,51 +1,15 @@
-// import { useState } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
-// import './App.css'
-// import FaceRecognition from './components/FaceRecognition';
-// import Chatbot  from './components/ChatBot';
-// import ConfirmButtons from './components/TestOrderConfirm';
-
-// function App() {
-//   const [count, setCount] = useState(0)
-
-//   return (
-//     <>
-//       <div className="App">
-//       <PageOne/>
-//       {/* <FaceRecognition /> */}
-//       {/* <Chatbot/> */}
-//       {/* <FaceRecognition /> */}
-//       {/* <ConfirmButtons transactionId="67dd9d68d2867db3f7559abe" serverUserId="67dd9d21d2867db3f7559abd" receiverUserId="67dd9c2fd2867db3f7559abc" /> */}
-//       </div>
-     
-//     </>
-//   )
-// }
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
-// import Dashboard from "./pages/Dashboard";
-// import ListFood from "./pages/ListFood";
-// import Marketplace from "./pages/Marketplace";
-// import OrderConfirmation from "./pages/OrderConfirmation";
-// import Rewards from "./pages/Rewards";
-// import AdminPanel from "./pages/AdminPanel";
-import Navbar from "./components/Navbar";
-// import Footer from "./components/Footer";
-import ListedItem from "./components/ListedItem";
-// import PriceAI from './components/PriceAI';
-// import PageOne from './components/PageOne';
-import MarketplacePage from './components/MarketplacePage';
+import MarketplacePage from "./components/MarketplacePage";
 import ProfilePage from "./pages/Profile";
 import UpdateProfile from "./pages/UpdateProfile";
 import CustomerService from "./pages/CustomerSupport";
+import Navbar from "./components/Navbar";
+import ChatBot from "./components/ChatBot"; // ✅ Import Chatbot
 
 function App() {
-  // const [count, setCount] = useState(0)
-
   return (
     <Router>
       <Navbar />
@@ -57,16 +21,16 @@ function App() {
         <Route path="/viewProfile" element={<ProfilePage />} />
         <Route path="/updateProfile" element={<UpdateProfile />} />
         <Route path="/contact" element={<CustomerService />} />
-        {/* <Route path="/dashboard" element={<Dashboard />} /> */}
-        {/* <Route path="/list-food" element={<ListFood />} /> */}
-        {/* <Route path="/marketplace" element={<Marketplace />} /> */}
-        {/* <Route path="/order-confirmation" element={<OrderConfirmation />} /> */}
-        {/* <Route path="/rewards" element={<Rewards />} /> */}
-        {/* <Route path="/admin" element={<AdminPanel />} /> */}
       </Routes>
-      {/* <Footer /> */}
+
+      {/* ✅ Show Chatbot only on NON-Auth Pages */}
+      {!["/login", "/signUp"].includes(window.location.pathname) && (
+        <div className="fixed bottom-4 right-4 z-50">
+          <ChatBot />
+        </div>
+      )}
     </Router>
   );
 }
-export default App;
 
+export default App;
