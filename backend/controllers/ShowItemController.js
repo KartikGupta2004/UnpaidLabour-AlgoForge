@@ -45,7 +45,7 @@ const addItem = async (req, res) => {
 
     // ✅ Set Expiry Dates
     const finalExpiryDate =
-      itemType === "Perishable" ? new Date(expiryDate) : new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
+      itemType === "Perishable" ? new Date(Date.now() + 2 * 24 * 60 * 60 * 1000) /* 48 hours */: new Date(expiryDate);
 
     // ✅ Assign rating from the fetched user data
     const finalRating = listedByData.rating ?? 3; // Default to 3 if no rating exists

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
-
+import { Star } from "lucide-react";
 const GeolocationComponent = () => {
   const HERE_API_KEY = import.meta.env.VITE_HERE_API_KEY;
 
@@ -271,22 +271,99 @@ const GeolocationComponent = () => {
 
       <div ref={mapRef} style={{ width: '100%', height: '400px', border: '1px solid #ccc', marginTop: '20px' }}></div>
       {/* Marketplace items list */}
-      {nearestItems.length > 0 && (
-        <ul style={{ padding: 0, listStyle: 'none', marginTop: '20px' }}>
-          {nearestItems.map((item, i) => (
-            <li key={i} style={{ marginBottom: '15px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
-              <strong>{item.itemName}</strong> {item.quantity && `(${item.quantity})`} - {item.cost ? `${item.cost} Rs` : ''}
-              <br />Seller: {item.name} | Contact: {item.contact}
-              <br />Location: {item.location}
-              <br />Expiry: {formatCountdown(item.expiryDate)}
-              <br />
-              {item.details && item.details.distance
-                ? <span style={{ color: 'blue' }}>Distance: {item.details.distance}m</span>
-                : <span style={{ color: 'gray' }}></span>}
-            </li>
-          ))}
-        </ul>
-      )}
+      {/* Marketplace items list */}
+{nearestItems.length > 0 && (
+  <div
+    style={{
+      display: 'flex',
+      overflowX: 'auto',
+      gap: '1rem',
+      marginTop: '20px',
+      padding: '0 10px'
+    }}
+  >
+    {nearestItems.map((item, i) => (
+      <div
+        key={i}
+        style={{ minWidth: '250px', flex: '0 0 auto' }}
+        className="overflow-hidden border border-gray-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white"
+      >
+        {/* Image Section */}
+        <div className="relative w-full h-48 bg-gray-200">
+          {item.image ? (
+            <Image
+              src={item.image}
+              alt={item.itemName}
+              fill
+              className="object-cover"
+            />
+          ) : (
+            <div className="flex items-center justify-center w-full h-full text-gray-400">
+              No Image Available
+            </div>
+          )}
+        </div>
+
+        {/* Content Section */}
+        <div className="p-4">
+          <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">
+            {item.itemName}
+          </h3>
+
+          <div className="flex justify-between text-sm text-gray-600 mb-2">
+            {item.itemType === "Non-Perishable" && (
+              <span>Expires on: {new Date(item.expiryDate).toLocaleDateString("en-US", {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              })}</span>
+            )}
+
+            {item.itemType === "Perishable" && (() => {
+              const expiryDate = new Date(item.expiryDate);
+              const now = new Date();
+              const timeDiff = expiryDate - now;
+              if (timeDiff <= 0) return <span>Expired</span>;
+              const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+              return <span>Expires in: {daysLeft} {daysLeft === 1 ? "day" : "days"}</span>;
+            })()}
+            {item.details && item.details.distance
+              ? <span style={{ color: 'blue' }}>Distance: {item.details.distance}m</span>
+              : <span style={{ color: 'gray' }}></span>}
+          </div>
+
+          <div className="flex justify-between items-center text-sm">
+            {/* Served By Section */}
+            <div>
+              <div className="text-gray-500">Served By</div>
+              <div className="font-medium">{item.name}</div>
+            </div>
+
+            {/* Ratings Section */}
+            <div className="flex items-center">
+              {item.listedByType === "Resturant" && <span className="mr-1 text-gray-500">{item.ratings}</span>}
+              <div className="flex">
+                {[...Array(1)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`w-4 h-4 ${i < item.ratings ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Cost Section (Visible Only for Non-Donations) */}
+          {item.type !== "Donation" && (
+            <div className="mt-2 text-right text-sm font-semibold text-gray-800">
+              Cost: ${item.cost?.toFixed(2)}
+            </div>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+)}
 
     </div>
   );

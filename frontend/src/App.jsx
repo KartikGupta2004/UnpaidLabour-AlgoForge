@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import FaceRecognition from './components/FaceRecognition';
-import Chatbot  from './components/ChatBot';
-import ConfirmButtons from './components/TestOrderConfirm';
+// import { useState } from 'react'
+// import reactLogo from './assets/react.svg'
+// import viteLogo from '/vite.svg'
+// import './App.css'
+// import FaceRecognition from './components/FaceRecognition';
+// import Chatbot  from './components/ChatBot';
+// import ConfirmButtons from './components/TestOrderConfirm';
 
 // function App() {
 //   const [count, setCount] = useState(0)
@@ -39,9 +39,11 @@ import ListedItem from "./components/ListedItem";
 // import PriceAI from './components/PriceAI';
 import PageOne from './components/PageOne';
 import GeolocationComponent from './components/GeolocationComponent';
+import ProfilePage from "./pages/Profile";
+import UpdateProfile from "./pages/UpdateProfile";
 
 function App() {
-  const [count, setCount] = useState(0)
+  // const [count, setCount] = useState(0)
 
   return (
     <Router>
@@ -51,6 +53,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signUp" element={<SignUp />} />
         <Route path="/geoLocation" element={<GeolocationComponent />} />
+        <Route path="/viewProfile" element={<ProfilePage />} />
+        <Route path="/updateProfile" element={<UpdateProfile />} />
         {/* <Route path="/dashboard" element={<Dashboard />} /> */}
         {/* <Route path="/list-food" element={<ListFood />} /> */}
         {/* <Route path="/marketplace" element={<Marketplace />} /> */}
@@ -62,8 +66,5 @@ function App() {
     </Router>
   );
 }
-
-
-
 export default App;
 

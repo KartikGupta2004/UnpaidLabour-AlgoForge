@@ -14,6 +14,11 @@ const kitchenSchema = new Schema(
       unique: true,
       required : true
     },
+    contact: {
+      type: String,
+      unique : true,
+      required: true,
+    },
     fssaiId: {
       type: String,
       unique: true, // Ensures FSSAI ID is unique
