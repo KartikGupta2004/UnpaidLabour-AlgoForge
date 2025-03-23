@@ -8,6 +8,8 @@ import UpdateProfile from "./pages/UpdateProfile";
 import CustomerService from "./pages/CustomerSupport";
 import Navbar from "./components/Navbar";
 import ChatBot from "./components/ChatBot"; // ✅ Import Chatbot
+import DonationPage from "./components/DonationPage";
+import Footer from "./components/Footer";
 function App() {
   const authToken = localStorage.getItem("authToken"); 
 
@@ -19,6 +21,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signUp" element={<SignUp />} />
         <Route path="/marketplace" element={<MarketplacePage />} />
+        <Route path="/donation" element={<DonationPage />} />
         <Route path="/viewProfile" element={<ProfilePage />} />
         <Route path="/updateProfile" element={<UpdateProfile />} />
         <Route path="/contact" element={<CustomerService />} />
@@ -27,6 +30,7 @@ function App() {
       {authToken  && (
         <ChatBot />
       )}
+      <Footer/>
     </Router>
   );
 }
