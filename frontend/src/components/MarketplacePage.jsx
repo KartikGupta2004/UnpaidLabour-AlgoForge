@@ -348,11 +348,7 @@ const MarketplacePage = () => {
 
           {/* Cost Section (Visible Only for Non-Donations) */}
           {item.type !== "Donation" && (
-<<<<<<< Updated upstream
-            <div className="cost">Cost: ${item.cost?.toFixed(2)}</div>
-=======
             <div className="cost">Cost: {item.cost?.toFixed(2)} ₹</div>
->>>>>>> Stashed changes
           )}
         </div>
       </div>

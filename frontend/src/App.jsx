@@ -12,7 +12,6 @@ import DonationPage from "./components/DonationPage";
 import Footer from "./components/Footer";
 import AboutUs from "./pages/AboutUs";
 import FaceRecognition from "./components/FaceRecogniton";
-import ChatBot from "./components/ChatBot";
 import FinalTransaction from "./pages/Transaction.jsx";
 function App() {
   const authToken = localStorage.getItem("authToken"); 

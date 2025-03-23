@@ -1,120 +1,195 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ChatBot from "../components/ChatBot";
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
   const authToken = localStorage.getItem("authToken");
 
   useEffect(() => {
+    if (!authToken) {
+      setError("Unauthorized. Please log in.");
+      setLoading(false);
+      return;
+    }
+
     const fetchProfile = async () => {
       try {
         const response = await axios.get("http://localhost:5000/users/getUserData", {
-          headers: { Authorization: `Bearer ${authToken}` },
+          headers: { Authorization: `Bearer ${authToken}`},
         });
-        setUser(response.data.users);
+
+        if (response.data.success) {
+          setUser(response.data.user);
+        } else {
+          setError("Failed to load profile. Please try again.");
+        }
       } catch (error) {
         console.error("Error fetching profile:", error);
         setError("Failed to load profile. Please try again later.");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchProfile();
-  }, []);
+  }, [authToken]);
 
-  if (error) return <p className="text-red-500 text-center font-medium mt-8">{error}</p>;
-  if (!user) return <p className="text-center text-gray-500 mt-8">Loading profile...</p>;
+  const completeTransaction = async (transactionId) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:5000/transactions/complete/${transactionId}`,
+        {}, // No request body needed, transactionId is in params
+        {
+          headers: { Authorization: `Bearer ${authToken}`},
+        }
+      );
+
+      if (response.data.message) {
+        alert("Transaction completed successfully! ✅");
+        window.location.reload(); // Refresh the page to update status
+      } else {
+        alert("Failed to complete transaction.");
+      }
+    } catch (error) {
+      console.error("Error completing transaction:", error);
+      alert("Error completing transaction. Please try again.");
+    }
+  };
+
+  if (loading) return <p className="text-center text-gray-500">Loading profile...</p>;
+  if (error) return <p className="text-red-500 text-center">{error}</p>;
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6" style={{backgroundImage: 'linear-gradient(to bottom right, #f3f4f6, #d1d5db)'}}>
-      <div className="w-full max-w-2xl bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl relative">
-        {/* Decorative elements */}
-        <div className="absolute -top-12 -right-12 w-24 h-24 bg-gray-200 rounded-full opacity-30"></div>
-        <div className="absolute top-32 -left-6 w-12 h-12 bg-gray-300 rounded-full opacity-20"></div>
+    <div className="flex flex-col items-center min-h-screen bg-gray-100 py-10">
+      <div className="bg-white shadow-lg rounded-lg p-6 max-w-3xl w-full">
         
-        {/* Header with gradient */}
-        <div className="relative overflow-hidden" style={{backgroundImage: 'linear-gradient(135deg,rgb(13, 155, 37),rgb(15, 148, 59))'}}>
-          <div className="p-6 text-white relative z-10">
-            <h2 className="text-2xl font-bold">Profile</h2>
-            <p className="mt-1 text-green-100 opacity-90">Your account information</p>
+        {/* Profile Header */}
+        <div className="flex items-center space-x-4">
+          <div className="w-16 h-16 bg-green-600 text-white rounded-full flex items-center justify-center text-xl font-bold">
+            {user.name ? user.name[0] : "?"}
           </div>
-          {/* Abstract shapes */}
-          <div className="absolute top-0 right-0 w-full h-full opacity-10">
-            <div className="absolute top-4 right-4 w-16 h-16 rounded-full bg-white"></div>
-            <div className="absolute bottom-2 left-12 w-20 h-8 rounded-full bg-white"></div>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800">{user.name || "Unknown"}</h2>
+            <p className="text-gray-600 capitalize">{user.role || "User"}</p>
           </div>
-          <div className="h-1 w-full bg-gradient-to-r from-green-400 via-green-500 to-green-600"></div>
         </div>
-        
-        <div className="p-6 space-y-5 bg-white">
-          {/* User Details */}
-          <div className="bg-gray-50 p-4 rounded-md border-l-4 border-green-500 shadow-sm">
-            <h3 className="text-lg font-semibold mb-2 text-gray-800">Personal Information</h3>
-            <div className="space-y-2">
-              <p className="flex justify-between">
-                <span className="text-gray-600">Name:</span>
-                <span className="font-medium text-gray-800">{user.name}</span>
-              </p>
-              <p className="flex justify-between">
-                <span className="text-gray-600">Email:</span>
-                <span className="font-medium text-gray-800">{user.email}</span>
-              </p>
-              <p className="flex justify-between">
-                <span className="text-gray-600">Contact:</span>
-                <span className="font-medium text-gray-800">{user.contact}</span>
-              </p>
-              <p className="flex justify-between">
-                
-                <span className="text-gray-600">Address:</span>
 
-                <span className="font-medium text-gray-800">{user.location}</span>
-              </p>
-            </div>
+        {/* User Info Section */}
+        <div className="mt-6 border-t border-gray-200 pt-4">
+          <h3 className="text-lg font-semibold text-gray-700">Personal Information</h3>
+          <div className="grid grid-cols-2 gap-4 mt-2">
+            <p><strong className="text-gray-700">Email:</strong> {user.email || "N/A"}</p>
+            <p><strong className="text-gray-700">Contact:</strong> {user.contact || "N/A"}</p>
+            <p><strong className="text-gray-700">Address:</strong> {user.location || "N/A"}</p>
+            <p><strong className="text-gray-700">Reward Points:</strong> <span className="text-green-600 font-medium">{user.reward || 0}</span></p>
           </div>
+        </div>
 
-          {/* User Statistics */}
-          <div className="bg-gray-50 p-4 rounded-md border-l-4 border-green-500 shadow-sm">
-            <h3 className="text-lg font-semibold mb-2 text-gray-800">Statistics</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white p-3 rounded shadow-sm">
-                <p className="text-gray-500 text-sm">Orders Served</p>
-                <p className="text-2xl font-bold text-gray-800">{user.OrdersServed}</p>
-              </div>
-              <div className="bg-white p-3 rounded shadow-sm">
-                <p className="text-gray-500 text-sm">Orders Received</p>
-                <p className="text-2xl font-bold text-gray-800">{user.OrdersReceived}</p>
-              </div>
-              <div className="bg-white p-3 rounded shadow-sm">
-                <p className="text-gray-500 text-sm">Donations Served</p>
-                <p className="text-2xl font-bold text-gray-800">{user.DonationsServed}</p>
-              </div>
-              <div className="bg-white p-3 rounded shadow-sm">
-                <p className="text-gray-500 text-sm">Reward Points</p>
-                <p className="text-2xl font-bold text-green-600">{user.reward}</p>
-              </div>
-            </div>
+        {/* User Statistics */}
+        <div className="mt-6 border-t border-gray-200 pt-4">
+          <h3 className="text-lg font-semibold text-gray-700">Statistics</h3>
+          <div className="grid grid-cols-2 gap-4 mt-2">
+            <p><strong className="text-gray-700">Orders Served:</strong> <span className="text-green-600">{user.OrdersServed || 0}</span></p>
+            <p><strong className="text-gray-700">Orders Received:</strong> <span className="text-green-600">{user.OrdersReceived || 0}</span></p>
+            <p><strong className="text-gray-700">Donations Served:</strong> <span className="text-green-600">{user.DonationsServed || 0}</span></p>
+            <p><strong className="text-gray-700">Rating:</strong> <span className="text-green-600">⭐ {user.rating || 3}/5</span></p>
           </div>
+        </div>
 
-          <a 
-            href="/updateProfile" 
-            className="inline-block px-5 py-2.5 rounded-md shadow-sm text-white font-medium transition-all duration-200 transform hover:-translate-y-0.5"
-            style={{backgroundImage: 'linear-gradient(to right,rgb(27, 176, 74),rgb(18, 170, 58))'}}
+        {/* Orders Placed Section */}
+        <div className="mt-6 border-t border-gray-200 pt-4">
+          <h3 className="text-lg font-semibold text-gray-700">Orders Placed</h3>
+          {user.orders_placed.length > 0 ? (
+            <ul className="mt-2 space-y-3">
+              {user.orders_placed.map((order, index) => (
+                <li key={index} className="border border-gray-200 p-3 rounded-lg bg-gray-50 hover:border-green-600 transition-colors">
+                  <p><strong className="text-gray-700">Order ID:</strong> {order.orderId?._id || "N/A"}</p>
+                  <p>
+                    <strong className="text-gray-700">Status:</strong> 
+                    <span className={`ml-1 font-medium ${
+                      order.status === "Completed" ? "text-green-600" : 
+                      order.status === "Pending" ? "text-yellow-600" : "text-gray-600"
+                    }`}>
+                      {order.status}
+                    </span>
+                  </p>
+                  <p><strong className="text-gray-700">Ordered At:</strong> {new Date(order.orderedAt).toLocaleString()}</p>
+                  <p><strong className="text-gray-700">Food Items:</strong></p>
+                  <ul className="ml-4 text-gray-600">
+                    {order.foodItems.map((item, idx) => (
+                      <li key={idx}>- {item.foodName} ({item.quantity})</li>
+                    ))}
+                  </ul>
+
+                  {order.status === "Pending" && (
+                    <button
+                      onClick={() => completeTransaction(order.orderId?._id)}
+                      className="mt-3 bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
+                    >
+                      Complete Transaction
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500 italic">No orders placed yet.</p>
+          )}
+        </div>
+
+        {/* Orders Received Section */}
+        <div className="mt-6 border-t border-gray-200 pt-4">
+          <h3 className="text-lg font-semibold text-gray-700">Orders Received</h3>
+          {user.orders_received.length > 0 ? (
+            <ul className="mt-2 space-y-3">
+              {user.orders_received.map((order, index) => (
+                <li key={index} className="border border-gray-200 p-3 rounded-lg bg-gray-50 hover:border-green-600 transition-colors">
+                  <p><strong className="text-gray-700">Order ID:</strong> {order.orderId?._id || "N/A"}</p>
+                  <p>
+                    <strong className="text-gray-700">Status:</strong> 
+                    <span className={`ml-1 font-medium ${
+                      order.status === "Completed" ? "text-green-600" : 
+                      order.status === "Pending" ? "text-yellow-600" : "text-gray-600"
+                    }`}>
+                      {order.status}
+                    </span>
+                  </p>
+                  <p><strong className="text-gray-700">Ordered At:</strong> {new Date(order.orderedAt).toLocaleString()}</p>
+                  <p><strong className="text-gray-700">Food Items:</strong></p>
+                  <ul className="ml-4 text-gray-600">
+                    {order.foodItems.map((item, idx) => (
+                      <li key={idx}>- {item.foodName} ({item.quantity})</li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500 italic">No orders received yet.</p>
+          )}
+        </div>
+
+        {/* Edit Profile Button */}
+        <div className="mt-6">
+          <button
+            onClick={() => navigate("/updateProfile")}
+            className="block w-full text-center bg-green-600 hover:bg-green-700 text-white py-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
           >
             Edit Profile
-          </a>
-          
-          {/* Subtle footer with light gray text */}
-          <div className="pt-2 text-center text-xs text-gray-400">
-            Last updated: {new Date().toLocaleDateString()}
-          </div>
+          </button>
         </div>
       </div>
-      
-      {/* ✅ Chatbot Positioned in Bottom Right */}
-      {/* <div className="fixed bottom-4 right-4 z-50">
+
+      {/* Chatbot Positioned in Bottom Right */}
+      <div className="fixed bottom-4 right-4 z-50">
         <ChatBot />
-      </div> */}
+      </div>
     </div>
   );
 };
