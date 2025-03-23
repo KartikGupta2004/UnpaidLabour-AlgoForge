@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { Star } from "lucide-react";import { Plus } from 'lucide-react';
+import AddItems from './AddItems';
 import '../MarketPlace.css'
 const MarketplacePage = () => {
   const HERE_API_KEY = import.meta.env.VITE_HERE_API_KEY;
@@ -235,7 +236,7 @@ const MarketplacePage = () => {
 
   return (
     <>
-    <div style={{ display:'flex', flexDirection: 'column', margin: '0 auto' }}>
+    <div style={{display:'flex', flexDirection: 'column', margin: '0 auto' }}>
       <div className='flex justify-evenly'>
         <div className='flex flex-col justify-center items-center'>
       <h2>Find Marketplace Items</h2>
@@ -277,7 +278,7 @@ const MarketplacePage = () => {
         <button className='border b-2 p-2 rounded-xl hover: cursor-pointer' type="submit">Find & Sort Items</button>
       </form>
       </div>
-      <div ref={mapRef} style={{ width: '400px', height: '400px', border: '1px solid #ccc', marginTop: '20px' }}></div>
+      <div ref={mapRef} style={{ zIndex: '-1', width: '400px', height: '400px', border: '1px solid #ccc', marginTop: '20px' }}></div>
       </div>
       {/* Marketplace items list */}
       {/* Marketplace items list */}
@@ -355,9 +356,12 @@ const MarketplacePage = () => {
   </div>
 )}
     </div>
+    <AddItems className="z-10 relative"/>
+    {/* <button>
       <div className='flex justify-end items-end mt-10 mr-10 mb-10'>
         <Plus className='bg-red-400 w-12 h-12 rounded-full p-2 hover:cursor-pointer'/>
       </div>
+      </button> */}
       </>
   );
 };

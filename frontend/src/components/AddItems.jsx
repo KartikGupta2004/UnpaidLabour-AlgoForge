@@ -61,7 +61,7 @@ function AddItems() {
       {/* Pop-up Form Window */}
       {isOpen && (
         <div
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm"
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-0 backdrop-blur-sm"
           onClick={() => setIsOpen(false)} // Close on background click
         >
           <div
