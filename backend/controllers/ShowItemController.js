@@ -31,12 +31,12 @@ const addItem = async (req, res) => {
       return res.status(400).json({ message: "Invalid itemType" });
     }
 
-    // ✅ Fetch User Details
+    // ✅ Fetch User Details (Including Rating)
     let listedByData = null;
     if (listedByType.toLowerCase() === "individual") {
-      listedByData = await Individual.findById(listedById).select("name contact location");
+      listedByData = await Individual.findById(listedById).select("name contact location rating");
     } else if (listedByType.toLowerCase() === "kitchen") {
-      listedByData = await Kitchen.findById(listedById).select("name contact location");
+      listedByData = await Kitchen.findById(listedById).select("name contact location rating");
     }
 
     if (!listedByData) {
@@ -46,6 +46,9 @@ const addItem = async (req, res) => {
     // ✅ Set Expiry Dates
     const finalExpiryDate =
       itemType === "Perishable" ? new Date(expiryDate) : new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
+
+    // ✅ Assign rating from the fetched user data
+    const finalRating = listedByData.rating ?? 3; // Default to 3 if no rating exists
 
     // ✅ Create New Item
     const newItem = new ListedItem({
@@ -63,6 +66,7 @@ const addItem = async (req, res) => {
       location: listedByData.location,
       feeds: feeds || 1,
       expiryDate: finalExpiryDate,
+      rating: finalRating, // ✅ Rating fetched from Individual/Kitchen schema
     });
 
     // ✅ Save to Database
@@ -74,6 +78,7 @@ const addItem = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
 
 /**
  * @desc Get all donation items
