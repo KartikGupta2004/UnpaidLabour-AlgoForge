@@ -11,6 +11,7 @@ import ChatBot from "./components/ChatBot"; // ✅ Import Chatbot
 import DonationPage from "./components/DonationPage";
 import Footer from "./components/Footer";
 import AboutUs from "./pages/AboutUs";
+import FaceRecognition from "./components/FaceRecogniton";
 function App() {
   const authToken = localStorage.getItem("authToken"); 
 
@@ -27,6 +28,7 @@ function App() {
         <Route path="/updateProfile" element={<UpdateProfile />} />
         <Route path="/contact" element={<CustomerService />} />
         <Route path="/about" element={<AboutUs/>} />
+        <Route path="/facerecognition" element={<FaceRecognition/>} />
       </Routes>
 
       {authToken  && (
