@@ -1,22 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
-import { Star } from "lucide-react";import { Plus } from 'lucide-react';
+import { Star } from "lucide-react"; import { Plus } from 'lucide-react';
 import AddItems from './AddItems';
 import '../MarketPlace.css'
-// import ItemCard from './Card';
-import ItemCard from './ItemListingForm';
-const MarketplacePage = () => {
+const DonationPage = () => {
   const HERE_API_KEY = import.meta.env.VITE_HERE_API_KEY;
-  const [selectedItem, setSelectedItem] = useState(null);
-  
-  const handleItemClick = (item) => {
-    console.log(item," \ngot clicked")
-    setSelectedItem(item);
-  };
-  
-  const handleCloseModal = () => {
-    setSelectedItem(null);
-  };
 
   const [locationSource, setLocationSource] = useState('');
   const [userLocation, setUserLocation] = useState(null);
@@ -33,7 +21,6 @@ const MarketplacePage = () => {
   const mapInstanceRef = useRef(null);
   const uiRef = useRef(null);
 
-  // Initialize the map
   useEffect(() => {
     if (!window.H) {
       setError('HERE Maps API is not loaded.');
@@ -63,7 +50,7 @@ const MarketplacePage = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/itemlist/marketplace/');
+        const response = await axios.get('http://localhost:5000/itemlist/donations/');
         // Display the items as they are (unsorted)
         setNearestItems(response.data);
       } catch (err) {
@@ -86,7 +73,7 @@ const MarketplacePage = () => {
       if (expiredItems.length === 0) return; // ✅ Prevent unnecessary updates
   
       for (const item of expiredItems) {
-        // console.log(item);
+        console.log(item);
         try {
           await axios.delete(`http://localhost:5000/itemlist/mktplc/${item._id}`);
           expiredProcessed.current.add(item._id);
@@ -132,7 +119,7 @@ const MarketplacePage = () => {
 
   const fetchMarketplaceItems = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/itemlist/marketplace/');
+      const response = await axios.get('http://localhost:5000/itemlist/donations/');
       return response.data;
     } catch (error) {
       setError('Error fetching marketplace items: ' + error.message);
@@ -297,11 +284,11 @@ const MarketplacePage = () => {
       {nearestItems.length > 0 && (
   <div className="grid-container">
     {nearestItems.map((item, i) => (
-      <div key={i} className="card" onClick={() => handleItemClick(item)}>
+      <div key={i} className="card">
         {/* Image Section */}
         <div className="image-container">
           {item.image ? (
-            <img
+            <Image
               src={item.image}
               alt={item.itemName}
               fill
@@ -346,7 +333,7 @@ const MarketplacePage = () => {
             </div>
 
             <div className="ratings">
-              {<span className="rating-value">{item.rating}</span>}
+              {item.listedByType === "Resturant" && <span className="rating-value">{item.ratings}</span>}
               <div className="stars">
                 {[...Array(1)].map((_, i) => (
                   <Star
@@ -358,30 +345,21 @@ const MarketplacePage = () => {
             </div>
           </div>
 
-          {/* Cost Section (Visible Only for Non-Donations) */}
-          {item.type !== "Donation" && (
-            <div className="cost">Cost: {item.cost?.toFixed(2)} Rupees</div>
-          )}
+          
         </div>
       </div>
     ))}
-    {selectedItem && (
-        <ItemCard 
-          item={selectedItem} 
-          onClose={handleCloseModal} 
-        />
-      )}
   </div>
 )}
     </div>
-    <AddItems className="z-10 relative"/>
+    {role !== 'ngo' && <AddItems className= "z-10 block relative"/>}
     {/* <button>
       <div className='flex justify-end items-end mt-10 mr-10 mb-10'>
         <Plus className='bg-red-400 w-12 h-12 rounded-full p-2 hover:cursor-pointer'/>
-      </div>
+      </div> 
       </button> */}
       </>
   );
 };
 
-export default MarketplacePage;
+export default DonationPage;

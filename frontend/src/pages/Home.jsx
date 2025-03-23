@@ -1,34 +1,25 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css";
-import "swiper/css/pagination";
-import { Pagination, Autoplay } from "swiper/modules";
-import { ItemGrid } from "../components/CardsGrid";
-import ChatBot from "../components/ChatBot"; // ✅ Import ChatBot
-
+import { useState, useEffect } from "react"
+import { Link } from "react-router-dom"
+import { ChevronRight } from "lucide-react"
+import { Swiper, SwiperSlide } from "swiper/react"
+import "swiper/css"
+import "swiper/css/pagination"
+import { Pagination, Autoplay } from "swiper/modules"
+import { ItemGrid } from "../components/CardsGrid"
+import ChatBot from "../components/ChatBot";
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Sections */}
-      <HeroSection />
+      {/* <HeroSection />
       <ImpactSection />
       <DonationSection />
-      <PartnersCarousel />
-
-      {/* Items Grid */}
+      <PartnersCarousel /> */}
       <div className="container mx-auto py-8 px-4">
         <h1 className="text-3xl font-bold mb-6">Available Items</h1>
         <ItemGrid />
       </div>
-
-      {/* ✅ ChatBot positioned at bottom-right */}
-      <div className="fixed bottom-4 right-4 z-50">
-        <ChatBot />
-      </div>
     </div>
-  );
+  )
 }
 
 // HERO SECTION
@@ -53,6 +44,7 @@ function HeroSection() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
           {["Restaurant", "Individual", "NGO"].map((role) => (
             <div
+            //   to={`/${role.toLowerCase()}`}
               key={role}
               className="group relative rounded-xl bg-white shadow-md hover:shadow-lg transition p-6 text-center"
             >
@@ -68,7 +60,7 @@ function HeroSection() {
         </div>
       </div>
     </section>
-  );
+  )
 }
 
 // IMPACT SECTION
@@ -86,30 +78,30 @@ function ImpactSection() {
         </div>
       </div>
     </section>
-  );
+  )
 }
 
 function ImpactCard({ title, value, unit }) {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(0)
 
   useEffect(() => {
-    let start = 0;
-    const end = value;
-    const duration = 2000;
-    const stepTime = Math.abs(Math.floor(duration / end));
-
+    let start = 0
+    const end = value
+    const duration = 2000
+    const stepTime = Math.abs(Math.floor(duration / end))
+    
     const timer = setInterval(() => {
-      start += Math.ceil(end / 50);
+      start += Math.ceil(end / 50)
       if (start >= end) {
-        setCount(end);
-        clearInterval(timer);
+        setCount(end)
+        clearInterval(timer)
       } else {
-        setCount(start);
+        setCount(start)
       }
-    }, stepTime);
-
-    return () => clearInterval(timer);
-  }, [value]);
+    }, stepTime)
+    
+    return () => clearInterval(timer)
+  }, [value])
 
   return (
     <div className="p-6 shadow-md rounded-lg text-center bg-white">
@@ -117,83 +109,76 @@ function ImpactCard({ title, value, unit }) {
       <div className="text-3xl font-bold text-primary mb-1">{count.toLocaleString()}</div>
       <p className="text-sm text-gray-500">{unit}</p>
     </div>
-  );
+  )
 }
 
 // DONATION SECTION
 function DonationSection() {
-  const role = localStorage.getItem("userType");
+    const role = localStorage.getItem('userType')
 
-  return (
-    <section className="py-20">
-      <div className="container mx-auto px-4">
-        <div
-          className={`${
-            role !== "ngo" ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "flex justify-center items-center"
-          }`}
-        >
-          {/* Donation Card */}
-          <div className="bg-white shadow-md rounded-lg p-6 text-center">
-            <h2 className="text-3xl font-bold mb-4">Make a Difference Today</h2>
-            <p className="text-lg text-gray-600 mb-6">
-              Your donation helps us fight food waste and hunger in communities across the country.
-            </p>
-            <Link to="/">
-              <button className="rounded-full bg-green-400 text-black px-6 py-3 text-lg hover:cursor-pointer">
-                {role !== "ngo" ? "Donate Now" : "Request Donation"}
-              </button>
-            </Link>
-          </div>
-
-          {/* Marketplace Card */}
-          {role !== "ngo" && (
-            <div className="bg-white shadow-md rounded-lg p-6 text-center">
-              <h2 className="text-3xl font-bold mb-4">Food Marketplace</h2>
-              <p className="text-lg text-gray-600 mb-6">
-                Buy & sell surplus food at affordable prices, reducing waste and helping the community.
-              </p>
-              <Link to="/">
+    return (
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className={`${role != 'ngo' ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : 'flex justify-center items-center'}`}>
+            {/* Donation Card */}
+                <div className="bg-white shadow-md rounded-lg p-6 text-center">
+                <h2 className="text-3xl font-bold mb-4">Make a Difference Today</h2>
+                <p className="text-lg text-gray-600 mb-6">
+                    Your donation helps us fight food waste and hunger in communities across the country.
+                </p>
+                <Link to='/'>
                 <button className="rounded-full bg-green-400 text-black px-6 py-3 text-lg hover:cursor-pointer">
-                  Explore Marketplace
+                    {role != 'ngo' ? 'Donate Now' : 'Request Donation'}
                 </button>
-              </Link>
-            </div>
-          )}
+                </Link>
+                </div>
+            {/* Marketplace Card */}
+            
+                {role != 'ngo' && <div className="bg-white shadow-md rounded-lg p-6 text-center">
+                <h2 className="text-3xl font-bold mb-4">Food Marketplace</h2>
+                <p className="text-lg text-gray-600 mb-6">
+                    Buy & sell surplus food at affordable prices, reducing waste and helping the community.
+                </p>
+                <Link to='/'>
+                <button className="rounded-full bg-green-400 text-black px-6 py-3 text-lg hover:cursor-pointer">
+                    Explore Marketplace
+                </button>
+                </Link>
+                </div>}
+          </div>
         </div>
-      </div>
-    </section>
-  );
-}
+      </section>
+    )
+  }  
 
-// PARTNERS CAROUSEL
-function PartnersCarousel() {
-  const partners = Array.from({ length: 10 }, (_, i) => `/partners/rest-${i + 1}.png`);
-
-  return (
-    <section className="py-20 bg-gray-50">
-      <div className="container mx-auto px-4 text-center">
-        <h2 className="text-3xl font-bold mb-6">Our Partners</h2>
-
-        <Swiper
-          modules={[Autoplay]}
-          slidesPerView={2}
-          spaceBetween={20}
-          loop={true}
-          autoplay={{ delay: 3000 }}
-          breakpoints={{
-            640: { slidesPerView: 3 },
-            768: { slidesPerView: 4 },
-            1024: { slidesPerView: 5 },
-          }}
-          className="pb-8"
-        >
-          {partners.map((src, index) => (
-            <SwiperSlide key={index} className="flex justify-center">
-              <img src={src} alt={`Partner ${index + 1}`} className="rounded-lg shadow-md w-32 h-32 object-cover" />
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </div>
-    </section>
-  );
-}
+  function PartnersCarousel() {
+    const partners = Array.from({ length: 10 }, (_, i) => `/partners/rest-${i + 1}.png`)
+  
+    return (
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-6">Our Partners</h2>
+  
+          <Swiper
+            modules={[Autoplay]}
+            slidesPerView={2}
+            spaceBetween={20}
+            loop={true}
+            autoplay={{ delay: 3000 }}
+            breakpoints={{
+              640: { slidesPerView: 3 },
+              768: { slidesPerView: 4 },
+              1024: { slidesPerView: 5 },
+            }}
+            className="pb-8"
+          >
+            {partners.map((src, index) => (
+              <SwiperSlide key={index} className="flex justify-center">
+                <img src={src} alt={`Partner ${index + 1}`} className="rounded-lg shadow-md w-32 h-32 object-cover" />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+      </section>
+    )
+  }
