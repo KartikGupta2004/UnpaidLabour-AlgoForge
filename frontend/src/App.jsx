@@ -32,10 +32,8 @@ function App() {
         <Route path="/viewProfile" element={<ProfilePage />} />
         <Route path="/updateProfile" element={<UpdateProfile />} />
         <Route path="/contact" element={<CustomerService />} />
-<<<<<<< Updated upstream
         <Route path="/about" element={<AboutUs/>} />
         <Route path="/facerecognition" element={<FaceRecognition/>} />
-=======
         <Route path="/transactions" element={<FinalTransaction/>} />
         {/* <Route path="/dashboard" element={<Dashboard />} /> */}
         {/* <Route path="/list-food" element={<ListFood />} /> */}
@@ -43,7 +41,6 @@ function App() {
         {/* <Route path="/order-confirmation" element={<OrderConfirmation />} /> */}
         {/* <Route path="/rewards" element={<Rewards />} /> */}
         {/* <Route path="/admin" element={<AdminPanel />} /> */}
->>>>>>> Stashed changes
       </Routes>
 
       {authToken  && (
