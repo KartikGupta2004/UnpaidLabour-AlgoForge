@@ -7,6 +7,33 @@ import validator from "validator";
 import { OAuth2Client } from "google-auth-library";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+import mongoose from "mongoose"; // ✅ Import mongoose to validate ObjectId
+
+ const getUserDetails = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // ✅ Validate ObjectId format before querying
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid user ID format" });
+    }
+
+    const user = await Individual.findById(userId).populate([
+      "orders_placed.orderId",
+      "orders_received.orderId",
+    ]);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 
 // Login Controller
 const loginController = async (req, res) => {
@@ -196,4 +223,4 @@ const authController = async (req, res) => {
   }
 };
 
-export { loginController, registerController, authController};
+export { loginController, registerController, authController,getUserDetails};
