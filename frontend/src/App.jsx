@@ -13,6 +13,7 @@ import Footer from "./components/Footer";
 import AboutUs from "./pages/AboutUs";
 import FaceRecognition from "./components/FaceRecogniton";
 import FinalTransaction from "./pages/Transaction.jsx";
+import ConfirmButtons from './components/TestOrderConfirm.jsx'
 function App() {
   const authToken = localStorage.getItem("authToken"); 
 
@@ -31,6 +32,12 @@ function App() {
         <Route path="/about" element={<AboutUs/>} />
         <Route path="/facerecognition" element={<FaceRecognition/>} />
         <Route path="/transactions" element={<FinalTransaction/>} />
+        <Route path="/transactionverify" element={ <ConfirmButtons 
+        transactionId="67df9433e9dbe7464b5eb8bd" 
+        serverUserId="67df8dfce9dbe7464b5eb8a3" 
+        receiverUserId="67dee4db5844c17293a84dac" 
+      />} />
+        
         {/* <Route path="/dashboard" element={<Dashboard />} /> */}
         {/* <Route path="/list-food" element={<ListFood />} /> */}
         {/* <Route path="/marketplace" element={<Marketplace />} /> */}

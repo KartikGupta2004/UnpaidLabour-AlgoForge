@@ -20,7 +20,8 @@ function ChatBot() {
           const response = await axios.get("http://localhost:5000/users/getUserData", {
             headers: { Authorization: `Bearer ${authToken}` },
           });
-          setUser(response.data.users);
+          setUser(response.data.user);
+          console.log(response.data)
         } catch (error) {
           console.error("Error fetching profile:", error);
           setError("Failed to load profile. Please try again later.");
