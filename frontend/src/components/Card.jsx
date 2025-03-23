@@ -1,6 +1,6 @@
 // import Image from "next/image";
 import { Star } from "lucide-react";
-import GeolocationComponent from "./GeolocationComponent";
+// import MarketplacePage from './components/MarketplacePage';
 export function ItemCard({ item }) {
   console.log(item)
   
