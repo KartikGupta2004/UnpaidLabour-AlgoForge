@@ -345,10 +345,7 @@ const DonationPage = () => {
             </div>
           </div>
 
-          {/* Cost Section (Visible Only for Non-Donations) */}
-          {item.type !== "Donation" && (
-            <div className="cost">Cost: ${item.cost?.toFixed(2)}</div>
-          )}
+          
         </div>
       </div>
     ))}
