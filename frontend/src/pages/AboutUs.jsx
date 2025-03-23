@@ -140,17 +140,8 @@ export default function AboutUs() {
             Whether you're a household with leftover meals, a restaurant with surplus food, or someone looking to make a difference, 
             Food Hero provides the platform to turn potential waste into valuable resources.
           </p>
-          <button 
-            className="px-8 py-3 rounded-md text-white font-semibold transition-all duration-200 transform hover:-translate-y-0.5"
-            style={{backgroundImage: 'linear-gradient(to right, #10b981, #059669)'}}
-          >
-            Get Started Today
-          </button>
           
-          {/* Subtle footer */}
-          <div className="mt-12 pt-6 border-t border-gray-200 text-gray-400 text-sm">
-            Food Hero © {new Date().getFullYear()} | Fighting food waste one meal at a time
-          </div>
+          
         </div>
       </div>
     </div>

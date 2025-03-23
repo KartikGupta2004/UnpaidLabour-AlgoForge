@@ -10,6 +10,7 @@ import Navbar from "./components/Navbar";
 import ChatBot from "./components/ChatBot"; // ✅ Import Chatbot
 import DonationPage from "./components/DonationPage";
 import Footer from "./components/Footer";
+import AboutUs from "./pages/AboutUs";
 function App() {
   const authToken = localStorage.getItem("authToken"); 
 
@@ -25,6 +26,7 @@ function App() {
         <Route path="/viewProfile" element={<ProfilePage />} />
         <Route path="/updateProfile" element={<UpdateProfile />} />
         <Route path="/contact" element={<CustomerService />} />
+        <Route path="/about" element={<AboutUs/>} />
       </Routes>
 
       {authToken  && (
