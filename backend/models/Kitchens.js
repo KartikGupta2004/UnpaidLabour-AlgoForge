@@ -44,7 +44,14 @@ const kitchenSchema = new Schema(
       type: Number,
       default: 0, // Optional field
     },
+    rating: { 
+      type: Number, 
+      min: 1, 
+      max: 5, 
+      default: 3, // Optional: Default rating
+    }
   },
+  
   { timestamps: true }
 );
 

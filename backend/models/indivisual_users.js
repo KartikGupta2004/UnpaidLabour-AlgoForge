@@ -35,6 +35,12 @@ const individualSchema = new Schema(
       },
       
     ],
+    rating: { 
+      type: Number, 
+      min: 1, 
+      max: 5, 
+      default: 3, // Optional: Default rating
+    }
   },
   { timestamps: true }
 );
