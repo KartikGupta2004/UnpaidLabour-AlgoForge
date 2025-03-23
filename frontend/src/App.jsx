@@ -41,6 +41,7 @@ import PageOne from './components/PageOne';
 import GeolocationComponent from './components/GeolocationComponent';
 import ProfilePage from "./pages/Profile";
 import UpdateProfile from "./pages/UpdateProfile";
+import CustomerService from "./pages/CustomerSupport";
 
 function App() {
   // const [count, setCount] = useState(0)
@@ -55,6 +56,7 @@ function App() {
         <Route path="/geoLocation" element={<GeolocationComponent />} />
         <Route path="/viewProfile" element={<ProfilePage />} />
         <Route path="/updateProfile" element={<UpdateProfile />} />
+        <Route path="/contact" element={<CustomerService />} />
         {/* <Route path="/dashboard" element={<Dashboard />} /> */}
         {/* <Route path="/list-food" element={<ListFood />} /> */}
         {/* <Route path="/marketplace" element={<Marketplace />} /> */}
