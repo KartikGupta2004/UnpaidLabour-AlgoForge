@@ -11,7 +11,7 @@ const ListedItem = () => {
     const fetchItem = async () => {
       try {
         const response = await axios.get(`/itemlist/${itemId}`);
-        console.log(response)
+        
         const fetchedItem = response.data;
         
         setItems([

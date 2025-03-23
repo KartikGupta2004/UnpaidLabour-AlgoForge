@@ -26,6 +26,14 @@ const listedItemSchema = new Schema(
 
     // Expiry Date
     expiryDate: { type: Date },
+
+    // ✅ New Field: Rating (1 to 5 scale, float)
+    rating: { 
+      type: Number, 
+      min: 1, 
+      max: 5, 
+      default: 3, // Optional: Default rating
+    }
   },
   { timestamps: true }
 );

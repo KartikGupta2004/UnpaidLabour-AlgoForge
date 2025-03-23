@@ -52,13 +52,12 @@ function PriceAI({ query, onPriceFetched }) {
       .join("\n");
 
     const prompt = `User query: "${query}".\nHere are 5 matching food items from our database:\n${matchList}\n\nPlease find the best match among these items and return only the recommended resale price (in integers) for that item. If you don't find anything accurate, return the cheapest product. Only respond with ₹ amount.`;
-
+    
     try {
       const response = await axios.post(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`,
         { contents: [{ parts: [{ text: prompt }] }] }
       );
-
       return response.data.candidates[0].content.parts[0].text;
     } catch (error) {
       console.error("Error querying Gemini:", error);
