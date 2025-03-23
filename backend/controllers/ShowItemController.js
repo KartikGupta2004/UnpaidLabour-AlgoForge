@@ -10,10 +10,8 @@ import Kitchen from "../models/Kitchens.js";
  */
 const addItem = async (req, res) => {
   try {
-    const { listingType, itemName, itemType, Description, quantity, cost, feeds, expiryDate } = req.body;
-
-    const listedById = req.user.id;
-    const listedByType = req.user.role;
+    const { listingType, itemName, itemType, Description, quantity, cost, feeds, expiryDate, listedById, listedByType, name,contact, location, photo } = req.body;
+    // console.log(req)
 
     // ✅ Validate Required Fields
     if (!listingType || !itemName || !itemType || !quantity || (itemType === "Perishable" && !expiryDate)) {
@@ -52,6 +50,7 @@ const addItem = async (req, res) => {
 
     // ✅ Create New Item
     const newItem = new ListedItem({
+      photo,
       listingType,
       itemName,
       itemType,
@@ -61,9 +60,9 @@ const addItem = async (req, res) => {
       listedById,
       listedByType,
       listedBy: listedById,
-      name: listedByData.name,
-      contact: listedByData.contact,
-      location: listedByData.location,
+      name,
+      contact,
+      location,
       feeds: feeds || 1,
       expiryDate: finalExpiryDate,
       rating: finalRating, // ✅ Rating fetched from Individual/Kitchen schema

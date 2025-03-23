@@ -4,7 +4,7 @@ import { authMiddleware } from "../middlewares/authMiddleware.js";
 const router = express.Router();
 router.get("/donations", getDonationItems);
 router.get("/marketplace",getMarketplaceItems);
-router.post("/addItem",authMiddleware,addItem);
+router.post("/addItem",addItem);
 router.get("/:id",getItemById);
 router.delete("/mktplc/:id", deleteItem);
 

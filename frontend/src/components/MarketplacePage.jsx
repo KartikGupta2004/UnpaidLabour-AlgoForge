@@ -32,6 +32,8 @@ const MarketplacePage = () => {
   const platformRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const uiRef = useRef(null);
+  const [user, setUser] = useState(null);
+  const authToken = localStorage.getItem("authToken");
 
   // Initialize the map
   useEffect(() => {
@@ -59,6 +61,22 @@ const MarketplacePage = () => {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/users/getUserData", {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        // console.log(response.data);
+        setUser(response.data.users);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+  
   // On initial mount, fetch all marketplace items (unsorted)
   useEffect(() => {
     const fetchItems = async () => {
@@ -374,7 +392,16 @@ const MarketplacePage = () => {
   </div>
 )}
     </div>
-    <AddItems className="z-10 relative"/>
+    {user && (
+      <AddItems
+        name={user.name || "Unknown"}
+        contact={user.contact || ""}
+        address={user.location || "No Address"}
+        id = {user._id}
+        className="z-10 relative"
+      />
+    )}
+
     {/* <button>
       <div className='flex justify-end items-end mt-10 mr-10 mb-10'>
         <Plus className='bg-red-400 w-12 h-12 rounded-full p-2 hover:cursor-pointer'/>

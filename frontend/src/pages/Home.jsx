@@ -122,7 +122,7 @@ function DonationSection() {
                 <p className="text-lg text-gray-600 mb-6">
                     Your donation helps us fight food waste and hunger in communities across the country.
                 </p>
-                <Link to='/'>
+                <Link to='/donation'>
                 <button className="rounded-full bg-green-400 text-black px-6 py-3 text-lg hover:cursor-pointer">
                     {role != 'ngo' ? 'Donate Now' : 'Request Donation'}
                 </button>
@@ -135,7 +135,7 @@ function DonationSection() {
                 <p className="text-lg text-gray-600 mb-6">
                     Buy & sell surplus food at affordable prices, reducing waste and helping the community.
                 </p>
-                <Link to='/'>
+                <Link to='/marketplace'>
                 <button className="rounded-full bg-green-400 text-black px-6 py-3 text-lg hover:cursor-pointer">
                     Explore Marketplace
                 </button>

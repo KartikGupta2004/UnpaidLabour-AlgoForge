@@ -7,8 +7,8 @@ const listedItemSchema = new Schema(
     itemName: { type: String, required: true },
     itemType: { type: String, enum: ["Perishable", "Non-Perishable"], required: true },
     quantity: { type: Number, required: true },
-    cost: { type: Number },
-
+    cost: { type: String },
+    photo: {type:String, required:true},
     // ✅ New Field: Listing Type (Marketplace or Donation)
     listingType: { type: String, enum: ["Marketplace", "Donation"], required: true },
 

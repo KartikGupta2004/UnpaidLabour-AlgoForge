@@ -5,7 +5,7 @@ import  Kitchen  from "../models/Kitchens.js"
 import  Ngo  from "../models/Ngo.js";
 import validator from "validator";
 import { OAuth2Client } from "google-auth-library";
-
+import uploadOnCloudinary from "../util/upload.js";
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Login Controller
@@ -196,4 +196,22 @@ const authController = async (req, res) => {
   }
 };
 
-export { loginController, registerController, authController};
+const uploadImageController = async (req, res) => {
+  try {
+    const file = req.file;
+    console.log("Uploading:", file.originalname);
+    const image = await uploadOnCloudinary(file.path);
+    console.log("Uploaded image:", image);
+
+    res.status(200).json({
+      message: "File uploaded successfully",
+      imageID: image.public_id,
+      imageURL: image.secure_url,
+    });
+  } catch (err) {
+    console.error("Error uploading file:", err);
+    res.status(500).json({ message: "Failed to upload file", error: err });
+  }
+};
+
+export { loginController, registerController, authController, uploadImageController};
