@@ -167,6 +167,7 @@ function SignUp() {
         localStorage.setItem("authToken", res.data.token);
         localStorage.setItem("userType", res.data.userType);
         navigate("/");
+        window.location.reload();
       }
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Something went wrong. Please try again.";
