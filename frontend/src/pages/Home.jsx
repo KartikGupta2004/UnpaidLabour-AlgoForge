@@ -474,7 +474,7 @@ function PartnersCarousel() {
                   <img 
                     src={src} 
                     alt={`Partner ${index + 1}`} 
-                    className="w-24 h-24 object-contain filter grayscale hover:grayscale-0 transition-all duration-300" 
+                    className="w-24 h-24 object-contain hover: transition-all duration-300" 
                   />
                 </div>
               </SwiperSlide>

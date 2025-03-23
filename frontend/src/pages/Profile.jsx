@@ -69,9 +69,9 @@ const ProfilePage = () => {
     <div className="flex flex-col items-center min-h-screen bg-gray-100 py-10">
       <div className="bg-white shadow-lg rounded-lg p-6 max-w-3xl w-full">
         
-        {/* Profile Header */}
+        {/* Profile Header with Circle Avatar */}
         <div className="flex items-center space-x-4">
-          <div className="w-16 h-16 bg-green-600 text-white rounded-full flex items-center justify-center text-xl font-bold">
+          <div className="w-16 h-16 bg-green-600 text-white rounded-full flex items-center justify-center text-xl font-bold shadow-md">
             {user.name ? user.name[0] : "?"}
           </div>
           <div>
@@ -80,57 +80,82 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {/* User Info Section */}
+        {/* User Info Section with Bubble Style */}
         <div className="mt-6 border-t border-gray-200 pt-4">
           <h3 className="text-lg font-semibold text-gray-700">Personal Information</h3>
           <div className="grid grid-cols-2 gap-4 mt-2">
-            <p><strong className="text-gray-700">Email:</strong> {user.email || "N/A"}</p>
-            <p><strong className="text-gray-700">Contact:</strong> {user.contact || "N/A"}</p>
-            <p><strong className="text-gray-700">Address:</strong> {user.location || "N/A"}</p>
-            <p><strong className="text-gray-700">Reward Points:</strong> <span className="text-green-600 font-medium">{user.reward || 0}</span></p>
+            <div className="p-2 bg-gray-50 rounded-lg border border-gray-200">
+              <p><strong className="text-gray-700">Email:</strong> {user.email || "N/A"}</p>
+            </div>
+            <div className="p-2 bg-gray-50 rounded-lg border border-gray-200">
+              <p><strong className="text-gray-700">Contact:</strong> {user.contact || "N/A"}</p>
+            </div>
+            <div className="p-2 bg-gray-50 rounded-lg border border-gray-200">
+              <p><strong className="text-gray-700">Address:</strong> {user.location || "N/A"}</p>
+            </div>
+            <div className="p-2 bg-gray-50 rounded-lg border border-gray-200">
+              <p><strong className="text-gray-700">Reward Points:</strong> <span className="text-green-600 font-medium">{user.reward || 0}</span></p>
+            </div>
           </div>
         </div>
 
-        {/* User Statistics */}
+        {/* User Statistics with Bubble Style */}
         <div className="mt-6 border-t border-gray-200 pt-4">
           <h3 className="text-lg font-semibold text-gray-700">Statistics</h3>
           <div className="grid grid-cols-2 gap-4 mt-2">
-            <p><strong className="text-gray-700">Orders Served:</strong> <span className="text-green-600">{user.OrdersServed || 0}</span></p>
-            <p><strong className="text-gray-700">Orders Received:</strong> <span className="text-green-600">{user.OrdersReceived || 0}</span></p>
-            <p><strong className="text-gray-700">Donations Served:</strong> <span className="text-green-600">{user.DonationsServed || 0}</span></p>
-            <p><strong className="text-gray-700">Rating:</strong> <span className="text-green-600">⭐ {user.rating || 3}/5</span></p>
+            <div className="p-2 bg-gray-50 rounded-lg border border-gray-200">
+              <p><strong className="text-gray-700">Orders Served:</strong> <span className="text-green-600">{user.OrdersServed || 0}</span></p>
+            </div>
+            <div className="p-2 bg-gray-50 rounded-lg border border-gray-200">
+              <p><strong className="text-gray-700">Orders Received:</strong> <span className="text-green-600">{user.OrdersReceived || 0}</span></p>
+            </div>
+            <div className="p-2 bg-gray-50 rounded-lg border border-gray-200">
+              <p><strong className="text-gray-700">Donations Served:</strong> <span className="text-green-600">{user.DonationsServed || 0}</span></p>
+            </div>
+            <div className="p-2 bg-gray-50 rounded-lg border border-gray-200">
+              <p><strong className="text-gray-700">Rating:</strong> <span className="text-green-600">⭐ {user.rating || 3}/5</span></p>
+            </div>
           </div>
         </div>
 
-        {/* Orders Placed Section */}
+        {/* Orders Placed Section with Bubble Style */}
         <div className="mt-6 border-t border-gray-200 pt-4">
           <h3 className="text-lg font-semibold text-gray-700">Orders Placed</h3>
           {user.orders_placed.length > 0 ? (
             <ul className="mt-2 space-y-3">
               {user.orders_placed.map((order, index) => (
-                <li key={index} className="border border-gray-200 p-3 rounded-lg bg-gray-50 hover:border-green-600 transition-colors">
-                  <p><strong className="text-gray-700">Order ID:</strong> {order.orderId?._id || "N/A"}</p>
-                  <p>
-                    <strong className="text-gray-700">Status:</strong> 
-                    <span className={`ml-1 font-medium ${
-                      order.status === "Completed" ? "text-green-600" : 
-                      order.status === "Pending" ? "text-yellow-600" : "text-gray-600"
-                    }`}>
-                      {order.status}
-                    </span>
-                  </p>
-                  <p><strong className="text-gray-700">Ordered At:</strong> {new Date(order.orderedAt).toLocaleString()}</p>
-                  <p><strong className="text-gray-700">Food Items:</strong></p>
-                  <ul className="ml-4 text-gray-600">
-                    {order.foodItems.map((item, idx) => (
-                      <li key={idx}>- {item.foodName} ({item.quantity})</li>
-                    ))}
-                  </ul>
+                <li key={index} className="border border-gray-200 p-3 rounded-lg bg-gray-50 hover:border-green-600 transition-colors shadow-sm">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p><strong className="text-gray-700">Order ID:</strong> {order.orderId?._id || "N/A"}</p>
+                      <p><strong className="text-gray-700">Ordered At:</strong> {new Date(order.orderedAt).toLocaleString()}</p>
+                    </div>
+                    <div className="px-3 py-1 rounded-full bg-white border border-gray-200 text-sm">
+                      <span className={`font-medium ${
+                        order.status === "Completed" ? "text-green-600" : 
+                        order.status === "Pending" ? "text-yellow-600" : "text-gray-600"
+                      }`}>
+                        {order.status}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-2">
+                    <p><strong className="text-gray-700">Food Items:</strong></p>
+                    <ul className="ml-4 text-gray-600">
+                      {order.foodItems.map((item, idx) => (
+                        <li key={idx} className="flex items-center">
+                          <div className="w-2 h-2 bg-green-600 rounded-full mr-2"></div>
+                          {item.foodName} ({item.quantity})
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
 
                   {order.status === "Pending" && (
                     <button
                       onClick={() => completeTransaction(order.orderId?._id)}
-                      className="mt-3 bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
+                      className="mt-3 bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded-full font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 shadow-sm"
                     >
                       Complete Transaction
                     </button>
@@ -143,30 +168,39 @@ const ProfilePage = () => {
           )}
         </div>
 
-        {/* Orders Received Section */}
+        {/* Orders Received Section with Bubble Style */}
         <div className="mt-6 border-t border-gray-200 pt-4">
           <h3 className="text-lg font-semibold text-gray-700">Orders Received</h3>
           {user.orders_received.length > 0 ? (
             <ul className="mt-2 space-y-3">
               {user.orders_received.map((order, index) => (
-                <li key={index} className="border border-gray-200 p-3 rounded-lg bg-gray-50 hover:border-green-600 transition-colors">
-                  <p><strong className="text-gray-700">Order ID:</strong> {order.orderId?._id || "N/A"}</p>
-                  <p>
-                    <strong className="text-gray-700">Status:</strong> 
-                    <span className={`ml-1 font-medium ${
-                      order.status === "Completed" ? "text-green-600" : 
-                      order.status === "Pending" ? "text-yellow-600" : "text-gray-600"
-                    }`}>
-                      {order.status}
-                    </span>
-                  </p>
-                  <p><strong className="text-gray-700">Ordered At:</strong> {new Date(order.orderedAt).toLocaleString()}</p>
-                  <p><strong className="text-gray-700">Food Items:</strong></p>
-                  <ul className="ml-4 text-gray-600">
-                    {order.foodItems.map((item, idx) => (
-                      <li key={idx}>- {item.foodName} ({item.quantity})</li>
-                    ))}
-                  </ul>
+                <li key={index} className="border border-gray-200 p-3 rounded-lg bg-gray-50 hover:border-green-600 transition-colors shadow-sm">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p><strong className="text-gray-700">Order ID:</strong> {order.orderId?._id || "N/A"}</p>
+                      <p><strong className="text-gray-700">Ordered At:</strong> {new Date(order.orderedAt).toLocaleString()}</p>
+                    </div>
+                    <div className="px-3 py-1 rounded-full bg-white border border-gray-200 text-sm">
+                      <span className={`font-medium ${
+                        order.status === "Completed" ? "text-green-600" : 
+                        order.status === "Pending" ? "text-yellow-600" : "text-gray-600"
+                      }`}>
+                        {order.status}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-2">
+                    <p><strong className="text-gray-700">Food Items:</strong></p>
+                    <ul className="ml-4 text-gray-600">
+                      {order.foodItems.map((item, idx) => (
+                        <li key={idx} className="flex items-center">
+                          <div className="w-2 h-2 bg-green-600 rounded-full mr-2"></div>
+                          {item.foodName} ({item.quantity})
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -175,11 +209,11 @@ const ProfilePage = () => {
           )}
         </div>
 
-        {/* Edit Profile Button */}
+        {/* Edit Profile Button with Bubble Style */}
         <div className="mt-6">
           <button
             onClick={() => navigate("/updateProfile")}
-            className="block w-full text-center bg-green-600 hover:bg-green-700 text-white py-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
+            className="block w-full text-center bg-green-600 hover:bg-green-700 text-white py-2 rounded-full font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 shadow-sm"
           >
             Edit Profile
           </button>
