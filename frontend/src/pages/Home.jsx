@@ -332,7 +332,6 @@ function DonationSection() {
                 <button className="rounded-full bg-green-600 text-white px-6 py-3 text-lg font-medium
                                   hover:bg-green-700 transition-colors duration-300 flex items-center">
                   {role !== 'ngo' ? 'Donate Now' : 'Request Donation'}
-                  {role === 'individual' ? 'Say Now' : 'Request Donation'}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </button>
               </Link>
