@@ -1,13 +1,23 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Star, X, Phone, Mail, MessageSquare } from "lucide-react";
 
-export default function EnlargedItemCard({ item, onClose }) {
+export default function ItemCard({ item, onClose }) {
+  const navigate = useNavigate();
   const [showContactInfo, setShowContactInfo] = useState(false);
   
   if (!item) return null;
 
   const toggleContactInfo = () => {
     setShowContactInfo(!showContactInfo);
+  };
+
+  const handlePurchaseClick = () => {
+    // Store item data in session storage to avoid URL length limitations
+    sessionStorage.setItem("transactionItem", JSON.stringify(item));
+    
+    // Navigate to transaction page
+    navigate("/transactions");
   };
 
   return (
@@ -153,7 +163,10 @@ export default function EnlargedItemCard({ item, onClose }) {
           
           {/* Action buttons */}
           <div className="mt-6 flex space-x-3">
-            <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+            <button 
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors"
+              onClick={handlePurchaseClick}  
+            >
               {item.type !== "Donation" ? "Purchase Now" : "Request Item"}
             </button>
             <button 

@@ -6,12 +6,17 @@ import MarketplacePage from "./components/MarketplacePage";
 import ProfilePage from "./pages/Profile";
 import UpdateProfile from "./pages/UpdateProfile";
 import CustomerService from "./pages/CustomerSupport";
+<<<<<<< Updated upstream
 import Navbar from "./components/Navbar";
 import ChatBot from "./components/ChatBot"; // ✅ Import Chatbot
 import DonationPage from "./components/DonationPage";
 import Footer from "./components/Footer";
 import AboutUs from "./pages/AboutUs";
 import FaceRecognition from "./components/FaceRecogniton";
+=======
+import ChatBot from "./components/ChatBot";
+import FinalTransaction from "./pages/Transaction.jsx";
+>>>>>>> Stashed changes
 function App() {
   const authToken = localStorage.getItem("authToken"); 
 
@@ -27,8 +32,18 @@ function App() {
         <Route path="/viewProfile" element={<ProfilePage />} />
         <Route path="/updateProfile" element={<UpdateProfile />} />
         <Route path="/contact" element={<CustomerService />} />
+<<<<<<< Updated upstream
         <Route path="/about" element={<AboutUs/>} />
         <Route path="/facerecognition" element={<FaceRecognition/>} />
+=======
+        <Route path="/transactions" element={<FinalTransaction/>} />
+        {/* <Route path="/dashboard" element={<Dashboard />} /> */}
+        {/* <Route path="/list-food" element={<ListFood />} /> */}
+        {/* <Route path="/marketplace" element={<Marketplace />} /> */}
+        {/* <Route path="/order-confirmation" element={<OrderConfirmation />} /> */}
+        {/* <Route path="/rewards" element={<Rewards />} /> */}
+        {/* <Route path="/admin" element={<AdminPanel />} /> */}
+>>>>>>> Stashed changes
       </Routes>
 
       {authToken  && (
