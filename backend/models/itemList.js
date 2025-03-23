@@ -4,6 +4,7 @@ const { Schema, model } = mongoose;
 
 const listedItemSchema = new Schema(
   {
+    photo: {type: String},
     itemName: { type: String, required: true },
     itemType: { type: String, enum: ["Perishable", "Non-Perishable"], required: true },
     quantity: { type: Number, required: true },

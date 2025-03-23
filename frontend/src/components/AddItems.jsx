@@ -6,7 +6,8 @@ import axios from "axios";
 function AddItems({name, contact, address, id}) {
   const [query, setQuery] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");
-  const [price, setPrice] = useState("");
+  const [suggestedPrice, setSuggestedPrice] = useState("");
+  const [userPrice, setUserPrice] = useState("");
   const [itemType, setItemType] = useState("Perishable");
   const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState(1);
@@ -14,24 +15,9 @@ function AddItems({name, contact, address, id}) {
   const [isOpen, setIsOpen] = useState(false);
   const [photo, setPhoto] = useState(null);
   const [photoURL, setPhotoURL] = useState("");
-  const [isLoading,setIsLoading] = useState(false)
-  const [errors,setErrors] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({});
   const [listingType, setListingType] = useState("Marketplace");
-  // const [userDetails, setUserDetails] = useState({
-  //   name: "John Doe",
-  //   address: "123 Main St, City",
-  //   contact: "+123456789",
-  // });
-
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     setUserDetails({
-  //       name: "Jane Doe",
-  //       address: "456 Elm St, Town",
-  //       contact: "+987654321",
-  //     });
-  //   }, 1000);
-  // }, []);
 
   const validateForm = () => {
     const newErrors = {};
@@ -39,6 +25,7 @@ function AddItems({name, contact, address, id}) {
     if (!description.trim()) newErrors.description = "Description is required.";
     if (quantity <= 0) newErrors.quantity = "Quantity must be at least 1.";
     if (!contact.trim()) newErrors.contact = "Contact is required.";
+    if (!userPrice.trim()) newErrors.userPrice = "Price is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -59,8 +46,7 @@ function AddItems({name, contact, address, id}) {
     if (query.trim() === "") return;
     const timeout = setTimeout(() => {
       setSubmittedQuery(query);
-      setPrice("");
-      console.log(price,"yeloooooooooooooooo")
+      setSuggestedPrice("");
     }, 2000);
     return () => clearTimeout(timeout);
   }, [query]);
@@ -109,7 +95,7 @@ function AddItems({name, contact, address, id}) {
         itemName: query,
         itemType,
         quantity,
-        cost: price || 0,
+        cost: userPrice, // Use the user-entered price
         listingType,
         status: "Pending",
         receiverId: null,
@@ -123,7 +109,7 @@ function AddItems({name, contact, address, id}) {
         rating: 3,
         photo: uploadedPhotoURL
       };
-      console.log("\nKAAAAARTTIK",newItem);
+      console.log("\nNew Item Data:", newItem);
       
       const response = await axios.post("http://localhost:5000/itemlist/addItem", newItem);
       console.log("Item added successfully:", response.data);
@@ -136,6 +122,14 @@ function AddItems({name, contact, address, id}) {
     } finally {
       setIsLoading(false);
     }
+  };
+  
+  // Handle the AI price suggestion
+  const handlePriceFetched = (price) => {
+    setSuggestedPrice(price);
+    // Pre-populate the user price with the suggested price as a starting point
+    // Remove this line if you want the user price field to start empty
+    setUserPrice(price);
   };
   
   return (
@@ -164,26 +158,26 @@ function AddItems({name, contact, address, id}) {
 
             {/* User Details */}
             <div className="bg-gray-100 p-3 rounded-lg mb-4 shadow-sm">
-              <p className="text-gray-700"><strong>Name:</strong> { name}</p>
+              <p className="text-gray-700"><strong>Name:</strong> {name}</p>
               <p className="text-gray-700"><strong>Address:</strong> {address}</p>
               <p className="text-gray-700"><strong>Contact:</strong> {contact}</p>
             </div>
 
             {/* File Upload */}
-            <div className="">
-                <label htmlFor="logo">Upload Image:</label>
+            <div className="mb-4">
+                <label htmlFor="logo" className="block mb-2 text-gray-700">Upload Image:</label>
                 <input
                   type="file"
                   id="logo"
                   accept="image/*"
                   onChange={handlePhotoChange}
-                  className=""
+                  className="w-full p-2 border border-gray-300 rounded"
                 />
                 {photoURL && (
                   <img
                     src={photoURL}
                     alt="Photo Preview"
-                    className=""
+                    className="mt-2 w-32 h-32 object-cover"
                   />
                 )}
               </div>
@@ -203,6 +197,7 @@ function AddItems({name, contact, address, id}) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
+            {errors.query && <p className="text-red-500 text-sm mb-2">{errors.query}</p>}
 
             {/* Item Type Dropdown */}
             <select
@@ -223,6 +218,7 @@ function AddItems({name, contact, address, id}) {
               min="1"
               onChange={(e) => setQuantity(e.target.value)}
             />
+            {errors.quantity && <p className="text-red-500 text-sm mb-2">{errors.quantity}</p>}
 
             {/* Description */}
             <textarea
@@ -232,23 +228,40 @@ function AddItems({name, contact, address, id}) {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             ></textarea>
+            {errors.description && <p className="text-red-500 text-sm mb-2">{errors.description}</p>}
       
-            {/* Suggested Price & Confirm Button */}
-            <div className="flex justify-between items-center mt-6">
-              <input type="text" className="p-2 border b-2"
-              placeholder={submittedQuery && `Suggested Price: ${price || "Fetching..."}`}
-              onChange={(e)=>setPrice = e.target.value}
+            {/* Price Input with AI Suggestion */}
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-2">Price</label>
+              <input 
+                type="text" 
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
+                placeholder={submittedQuery && suggestedPrice ? `Suggested: $${suggestedPrice}` : "Enter price..."}
+                value={userPrice}
+                onChange={(e) => setUserPrice(e.target.value)}
               />
-              <button onClick={handleSubmit} disabled={isLoading} className="bg-blue-600 text-white px-5 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-all">
-              {isLoading ? "Submitting..." : "Confirm"}
+              {errors.userPrice && <p className="text-red-500 text-sm mt-1">{errors.userPrice}</p>}
+              {submittedQuery && !suggestedPrice && <p className="text-sm text-gray-500 mt-1">Fetching price suggestion...</p>}
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex justify-end mt-6">
+              <button 
+                onClick={handleSubmit} 
+                disabled={isLoading} 
+                className="bg-blue-600 text-white px-5 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-all disabled:bg-blue-300"
+              >
+                {isLoading ? "Submitting..." : "Confirm"}
               </button>
             </div>
+            
+            {errors.form && <p className="text-red-500 text-sm mt-2">{errors.form}</p>}
           </div>
         </div>
       )}
 
       {/* Calls PriceAI with query and callback */}
-      {submittedQuery && <PriceAI query={submittedQuery} onPriceFetched={setPrice} />}
+      {submittedQuery && <PriceAI query={submittedQuery} onPriceFetched={handlePriceFetched} />}
     </div>
   );
 }

@@ -161,6 +161,7 @@ const getItemById = async (req, res) => {
       location: item.location,
       expiryDate: item.expiryDate ? item.expiryDate.toISOString() : null,
       createdAt: item.createdAt,
+      photo:item,photo,
       updatedAt: item.updatedAt,
     });
   } catch (error) {
