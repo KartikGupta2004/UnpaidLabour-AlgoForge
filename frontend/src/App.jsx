@@ -41,6 +41,7 @@ import ListedItem from "./components/ListedItem";
 import MarketplacePage from './components/MarketplacePage';
 import ProfilePage from "./pages/Profile";
 import UpdateProfile from "./pages/UpdateProfile";
+import CustomerService from "./pages/CustomerSupport";
 
 function App() {
   // const [count, setCount] = useState(0)
@@ -55,6 +56,7 @@ function App() {
         <Route path="/marketplace" element={<MarketplacePage />} />
         <Route path="/viewProfile" element={<ProfilePage />} />
         <Route path="/updateProfile" element={<UpdateProfile />} />
+        <Route path="/contact" element={<CustomerService />} />
         {/* <Route path="/dashboard" element={<Dashboard />} /> */}
         {/* <Route path="/list-food" element={<ListFood />} /> */}
         {/* <Route path="/marketplace" element={<Marketplace />} /> */}
