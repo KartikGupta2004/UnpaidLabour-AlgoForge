@@ -38,7 +38,7 @@ import Navbar from "./components/Navbar";
 import ListedItem from "./components/ListedItem";
 // import PriceAI from './components/PriceAI';
 import PageOne from './components/PageOne';
-import GeolocationComponent from './components/GeolocationComponent';
+import MarketplacePage from './components/MarketplacePage';
 import ProfilePage from "./pages/Profile";
 import UpdateProfile from "./pages/UpdateProfile";
 import CustomerService from "./pages/CustomerSupport";
@@ -53,7 +53,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signUp" element={<SignUp />} />
-        <Route path="/geoLocation" element={<GeolocationComponent />} />
+        <Route path="/marketplace" element={<MarketplacePage />} />
         <Route path="/viewProfile" element={<ProfilePage />} />
         <Route path="/updateProfile" element={<UpdateProfile />} />
         <Route path="/contact" element={<CustomerService />} />
