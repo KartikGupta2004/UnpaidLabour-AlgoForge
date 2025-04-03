@@ -12,7 +12,7 @@ const listedItemSchema = new Schema(
     // ✅ New Field: Listing Type (Marketplace or Donation)
     listingType: { type: String, enum: ["Marketplace", "Donation"], required: true },
 
-    status: { type: String, enum: ["Pending", "Delivered"], default: "Pending" },
+    status: { type: String, enum: ["notAddressed", "Pending", "Delivered"], default: "notAddressed" },
     receiverId: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
     Description: { type: String },
 

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "face-api.js": "^0.22.2",
     "framer-motion": "^12.5.0"
   }
 }

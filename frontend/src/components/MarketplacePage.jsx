@@ -300,9 +300,9 @@ const MarketplacePage = () => {
       <div key={i} className="card" onClick={() => handleItemClick(item)}>
         {/* Image Section */}
         <div className="image-container">
-          {item.image ? (
+          {item.photo ? (
             <img
-              src={item.image}
+              src={item.photo}
               alt={item.itemName}
               fill
               className="object-cover"

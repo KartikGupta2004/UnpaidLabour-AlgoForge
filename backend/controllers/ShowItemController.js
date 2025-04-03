@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import ListedItem from "../models/itemList.js";
 import Individual from "../models/indivisual_users.js";
 import Kitchen from "../models/Kitchens.js";
+import Transaction from "../models/transactions.js";
 
 /**
  * @desc Add a new item
@@ -189,4 +190,102 @@ const deleteItem = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-export { getDonationItems, getMarketplaceItems, getItemById, addItem, deleteItem };
+
+const UpdateItemStatus = async (req, res) => {
+  try {
+    const { senderpartyId, transactionId, senderType } = req.params;
+    const receiverId = req.user.id;
+    
+    if (!mongoose.Types.ObjectId.isValid(senderpartyId) || !mongoose.Types.ObjectId.isValid(transactionId)) {
+      return res.status(400).json({ message: "Invalid ID format" });
+    }
+    
+    // Find the transaction
+    const transaction = await Transaction.findById(transactionId);
+    
+    if (!transaction) {
+      return res.status(404).json({ message: "Transaction not found" });
+    }
+    
+    // Find the sender based on type
+    let sender;
+    if (senderType === "Restaurant") {
+      sender = await Kitchen.findById(senderpartyId);
+    } else if (senderType === "Individual") {
+      sender = await Individual.findById(senderpartyId);
+    } else {
+      return res.status(400).json({ message: "Invalid sender type" });
+    }
+    
+    if (!sender) {
+      return res.status(404).json({ message: "Sender not found" });
+    }
+    
+    // Get the receiver
+    const receiver = await Individual.findById(receiverId);
+    
+    if (!receiver) {
+      return res.status(404).json({ message: "Receiver not found" });
+    }
+    
+    // Update transaction status
+    transaction.status = req.body.status || "completed";
+    await transaction.save();
+    
+    // Update sender stats
+    if (transaction.type === "donation") {
+      sender.donationsServed = (sender.donationsServed || 0) + 1;
+    } else {
+      sender.ordersServed = (sender.ordersServed || 0) + 1;
+    }
+    
+    // Append transaction to sender's transactions array
+    // Create transactions array if it doesn't exist
+    if (!sender.transactions) {
+      sender.transactions = [];
+    }
+    sender.transactions.push({
+      transactionId: transaction._id,
+      type: transaction.type,
+      status: transaction.status,
+      date: transaction.updatedAt || new Date(),
+      partnerId: receiverId
+    });
+    
+    await sender.save();
+    
+    // Update receiver stats if needed
+    if (transaction.type === "donation") {
+      receiver.donationsServed = (receiver.donationsServed || 0) + 1;
+    } else {
+      receiver.ordersServed = (receiver.ordersServed || 0) + 1;
+    }
+    
+    // Append transaction to receiver's transactions array
+    // Create transactions array if it doesn't exist
+    if (!receiver.transactions) {
+      receiver.transactions = [];
+    }
+    receiver.transactions.push({
+      transactionId: transaction._id,
+      type: transaction.type,
+      status: transaction.status,
+      date: transaction.updatedAt || new Date(),
+      partnerId: senderpartyId,
+      partnerType: senderType
+    });
+    
+    await receiver.save();
+    
+    res.status(200).json({ 
+      message: "Transaction status updated successfully", 
+      transaction 
+    });
+    
+  } catch (error) {
+    console.error("Error updating transaction status:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export { getDonationItems, getMarketplaceItems, getItemById, addItem, deleteItem, UpdateItemStatus };

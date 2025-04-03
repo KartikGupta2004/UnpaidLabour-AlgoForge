@@ -238,7 +238,7 @@ const DonationPage = () => {
     <div style={{display:'flex', flexDirection: 'column', margin: '0 auto' }}>
       <div className='flex justify-evenly'>
         <div className='flex flex-col justify-center items-center'>
-      <h2>Find Marketplace Items</h2>
+      <h2>Find Donation Items</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={handleSubmit}>
         <label>

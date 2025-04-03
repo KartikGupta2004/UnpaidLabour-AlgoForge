@@ -78,8 +78,8 @@ const UpdateProfile = () => {
         const response = await axios.get("http://localhost:5000/users/getUserData", {
           headers: { Authorization: `Bearer ${authToken}` },
         });
-        response.data.users.contact = response.data.users.contact.replace(/^\+\d+\s/, '');
-        setProfile(response.data.users)
+        response.data.user.contact = response.data.user.contact.replace(/^\+\d+\s/, '');
+        setProfile(response.data.user)
       } catch (error) {
         console.error("Error fetching profile:", error);
       }

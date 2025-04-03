@@ -200,27 +200,38 @@ const registerController = async (req, res) => {
 
 // Auth Controller (for getting user info)
 const authController = async (req, res) => {
-  // console.log(req.user.id)
   try {
-    const users = await Individual.findById({ _id: req.user.id }) || await Kitchen.findById({ _id: req.user.id }) || await Ngo.findById({ _id: req.user.id });
-    if (!users) {
-      return res.status(200).send({
+    // Fetch user from any of the three collections
+    const user =
+      (await Individual.findById(req.user.id)
+        .populate("orders_placed.orderId", "status foodItems") // Populate orderId
+        .populate("orders_received.orderId", "status foodItems")) || 
+      (await Kitchen.findById(req.user.id)
+        .populate("orders_placed.orderId", "status foodItems")
+        .populate("orders_received.orderId", "status foodItems")) || 
+      (await Ngo.findById(req.user.id)
+        .populate("orders_placed.orderId", "status foodItems")
+        .populate("orders_received.orderId", "status foodItems"));
+
+    if (!user) {
+      return res.status(404).send({
         message: "User not found",
         success: false,
       });
     }
+
     res.status(200).send({
       success: true,
-      users
+      user,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).send({
       message: "Auth error",
       success: false,
       error,
     });
   }
-};
 
-export { loginController, registerController, authController,getUserDetails};
+};
+export { loginController, registerController, authController};

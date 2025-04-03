@@ -383,6 +383,51 @@ function DonationSection() {
               </div>
             </div>
           )}
+
+{role === 'individual' && (
+            <div 
+              className={`bg-white rounded-2xl p-8 shadow-lg border-l-4 border-black 
+                        transform transition-all duration-700 hover:shadow-xl
+                        ${isVisible ? 'translate-y-0 opacity-100 delay-300' : 'translate-y-10 opacity-0'}`}
+            >
+              <div className="flex items-start mb-6">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mr-4">
+                  <ShoppingCart className="text-gray-800 w-6 h-6" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold mb-2 text-gray-800">Earn Free Rewards</h2>
+                  <div className="h-1 w-16 bg-black rounded-full"></div>
+                </div>
+              </div>
+              
+              <p className="text-gray-600 mb-8 leading-relaxed">
+                Share a photo of you volunteering to donate people to the needy and earn virtue points in FoodHero.
+              </p>
+              
+              <div className="flex justify-between items-center">
+                <div className="flex -space-x-2">
+                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                    <span className="text-xs font-medium"> </span>
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                    <span className="text-xs font-medium"> </span>
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center">
+                    <span className="text-xs font-medium"> </span>
+                  </div>
+                </div>
+                
+                <Link to='/facerecognition'>
+                  <button className="rounded-full bg-black text-white px-6 py-3 text-lg font-medium
+                                    hover:bg-gray-800 transition-colors duration-300 flex items-center">
+                    Earn Rewards
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </button>
+                </Link>
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
     </section>
@@ -429,7 +474,7 @@ function PartnersCarousel() {
                   <img 
                     src={src} 
                     alt={`Partner ${index + 1}`} 
-                    className="w-24 h-24 object-contain filter grayscale hover:grayscale-0 transition-all duration-300" 
+                    className="w-24 h-24 object-contain hover: transition-all duration-300" 
                   />
                 </div>
               </SwiperSlide>
