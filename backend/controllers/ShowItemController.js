@@ -13,9 +13,9 @@ const addItem = async (req, res) => {
   try {
     const { listingType, itemName, itemType, Description, quantity, cost, feeds, expiryDate } = req.body;
 
-    const listedById = req.user.id;
-    const listedByType = req.user.role;
-
+    const listedById = req.user?.id;
+    const listedByType = req.user?.role;
+    console.log(req.user)
     // ✅ Validate Required Fields
     if (!listingType || !itemName || !itemType || !quantity || (itemType === "Perishable" && !expiryDate)) {
       return res.status(400).json({ message: "Missing required fields" });

@@ -234,4 +234,4 @@ const authController = async (req, res) => {
   }
 
 };
-export { loginController, registerController, authController};
+export { loginController, registerController, authController,getUserDetails};
