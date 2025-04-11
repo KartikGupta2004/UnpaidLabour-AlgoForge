@@ -12,10 +12,34 @@ import Transaction from "../models/transactions.js";
 const addItem = async (req, res) => {
   try {
     const { listingType, itemName, itemType, Description, quantity, cost, feeds, expiryDate } = req.body;
+    const listedById = req.user?.id; // Get user ID from token
 
-    const listedById = req.user?.id;
-    const listedByType = req.user?.role;
-    console.log(req.user)
+    if (!listedById) {
+      return res.status(401).json({ message: "Unauthorized: No user ID found in token" });
+    }
+
+    // ✅ Determine User Role Dynamically
+    let listedByType = null;
+    let listedByData = await Individual.findById(listedById).select("name contact location rating");
+    
+    if (listedByData) {
+      listedByType = "individual";
+    } else {
+      listedByData = await Kitchen.findById(listedById).select("name contact location rating");
+      if (listedByData) {
+        listedByType = "kitchen";
+      } else {
+        listedByData = await Ngo.findById(listedById).select("name contact location rating");
+        if (listedByData) {
+          listedByType = "ngo";
+        }
+      }
+    }
+
+    if (!listedByType) {
+      return res.status(404).json({ message: "User not found in Individual, Kitchen, or NGO collections" });
+    }
+
     // ✅ Validate Required Fields
     if (!listingType || !itemName || !itemType || !quantity || (itemType === "Perishable" && !expiryDate)) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -32,21 +56,9 @@ const addItem = async (req, res) => {
       return res.status(400).json({ message: "Invalid itemType" });
     }
 
-    // ✅ Fetch User Details (Including Rating)
-    let listedByData = null;
-    if (listedByType.toLowerCase() === "individual") {
-      listedByData = await Individual.findById(listedById).select("name contact location rating");
-    } else if (listedByType.toLowerCase() === "kitchen") {
-      listedByData = await Kitchen.findById(listedById).select("name contact location rating");
-    }
-
-    if (!listedByData) {
-      return res.status(404).json({ message: "ListedBy entity not found" });
-    }
-
     // ✅ Set Expiry Dates
     const finalExpiryDate =
-      itemType === "Perishable" ? new Date(Date.now() + 2 * 24 * 60 * 60 * 1000) /* 48 hours */: new Date(expiryDate);
+      itemType === "Perishable" ? new Date(Date.now() + 2 * 24 * 60 * 60 * 1000) /* 48 hours */ : new Date(expiryDate);
 
     // ✅ Assign rating from the fetched user data
     const finalRating = listedByData.rating ?? 3; // Default to 3 if no rating exists
@@ -67,7 +79,7 @@ const addItem = async (req, res) => {
       location: listedByData.location,
       feeds: feeds || 1,
       expiryDate: finalExpiryDate,
-      rating: finalRating, // ✅ Rating fetched from Individual/Kitchen schema
+      rating: finalRating,
     });
 
     // ✅ Save to Database
@@ -79,6 +91,7 @@ const addItem = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
 
 
 /**
